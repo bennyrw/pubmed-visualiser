@@ -3,15 +3,12 @@ import { connect } from 'react-redux';
 
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
-import Alert from '@material-ui/lab/Alert';
 
 import Search from './views/Search';
-import Loading from './views/Loading';
 import Results from './views/Results';
 
 import { StoreState } from './store';
 import { PublicationData } from './types';
-import { getText } from './constants';
 
 interface Props {
   publicationData?: PublicationData;

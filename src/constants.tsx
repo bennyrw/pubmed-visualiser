@@ -1,4 +1,11 @@
+import * as log from 'loglevel';
+
 import { Dictionary } from './types';
+
+/**
+ * Set the log level. Ideally this would be via a URL query parameter.
+ */
+log.setLevel('debug');
 
 /**
  * Toggle various debugging behaviours. Useful when getting layout right while the app is in particular states.

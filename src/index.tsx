@@ -3,16 +3,12 @@ import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
 import { createStore, applyMiddleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
-import * as log from 'loglevel';
 
 import App from './App';
 import { reducer } from './reducers';
 import { StoreState, getInitialState } from './store';
 import { Action } from './actions';
 import { fetchDataSaga } from './sagas';
-
-// todo - constant
-log.setLevel('debug');
 
 const sagaMiddleware = createSagaMiddleware();
 const initialState = getInitialState();

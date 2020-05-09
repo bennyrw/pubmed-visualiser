@@ -28,8 +28,8 @@ export function reducer(state = getInitialState(), action: Action): StoreState {
             return state;
         }
         case FETCH_YEAR_DATA_FAILED: {
-            const { payload: { searchTerm, year } } = action as FetchYearDataFailedAction;
-            // todo - maybe set missing flag or something on it?
+            //const { payload: { searchTerm, year } } = action as FetchYearDataFailedAction;
+            // todo - handle failure? Maybe show an icon or something?
             return state;
         }
     }

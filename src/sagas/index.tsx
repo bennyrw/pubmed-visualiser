@@ -1,4 +1,4 @@
-import { fork, take, call, put } from 'redux-saga/effects';
+import { fork, take, put, delay, retry } from 'redux-saga/effects';
 import * as log from 'loglevel';
 
 import {
@@ -6,33 +6,49 @@ import {
     fetchYearDataSucceeded,
     fetchYearDataFailed,
 } from '../actions';
-import { StoreState } from '../store';
 import { getPublishedArticleData } from '../external/publishedArticleApi';
 
-// todo - move to constants
-const REQUEST_MAX_ATTEMPTS = 3;
+/**
+ * NCBI advertises a maximum of 10 requests per second when using an API key (3 without).
+ * Stay within this limit.
+ * See https://www.ncbi.nlm.nih.gov/books/NBK25497/
+ */
+const MAX_REQUESTS_PER_SECOND = 9;
 
-// todo - retry
-// todo - throttle/delay
+const MAX_ATTEMPTS_PER_REQUEST = 3;
+/**
+ * Delays are probably rate-limiting related, so wait another second.
+ */
+const DELAY_BETWEEN_FAILURES = 1000;
 
 /**
  * Saga handling data fetches, triggered when a start fetch action occurs.
+ * Handles rate limiting and retrying.
  */
 export function* fetchDataSaga(): Generator {
     while (true) {
         const {payload} = (yield take(START_FETCH_DATA)) as StartFetchDataAction;
         const {searchTerm, minYear, maxYear} = payload;
 
+        const delayBetweenRequests = 1000 / MAX_REQUESTS_PER_SECOND;
+        let waitUntil: number = Date.now();
         for (let year = minYear; year <= maxYear; ++year) {
             log.debug(`forking fetchYearData for ${year}`);
-            yield fork(fetchYearData, searchTerm, year);
+            yield fork(fetchYearData, searchTerm, year, waitUntil);
+            waitUntil += delayBetweenRequests;
         }
     }
 }
 
-function* fetchYearData(searchTerm: string, year: number) {
+function* fetchYearData(searchTerm: string, year: number, waitUntil: number) {
+    // rate limiting
+    const remainingDelay = waitUntil - Date.now();
+    if (remainingDelay > 0) {
+        yield delay(remainingDelay);
+    }
+
     try {
-        const yearData = yield call(getPublishedArticleData, searchTerm, year);
+        const yearData = yield retry(MAX_ATTEMPTS_PER_REQUEST, DELAY_BETWEEN_FAILURES, getPublishedArticleData, searchTerm, year);
         log.info(`Successfully got data for ${year}`);
         yield put(fetchYearDataSucceeded(searchTerm, year, yearData));
     } catch (e) {
@@ -40,55 +56,3 @@ function* fetchYearData(searchTerm: string, year: number) {
         yield put(fetchYearDataFailed(searchTerm, year));
     }
 }
-
-/**
- * NCBI advertises a maximum of 10 requests per second when using an API key (3 without).
- * Stay within this limit.
- * See https://www.ncbi.nlm.nih.gov/books/NBK25497/
- */
-const MAX_REQUESTS_PER_SECOND = 5;
-
-// todo - move to utils
-function retryify(fn: Function, maxAttempts: number) {
-    return (...args: any[]) => {
-        for (let i = 0; i < maxAttempts; ++i) {
-            try {
-                return fn(...args);
-            } catch (e) {
-                if (i === maxAttempts) {
-                    // no more attempts
-                    throw e;
-                }
-            }
-        }
-    }
-}
-
-// todo
-/*
-// const makePendingDiseaseRequests = (searchTerm: string): PendingDiseaseRequest[] => {
-//     const requests = [];
-//     for (let year = EARLIEST_YEAR; year <= LATEST_YEAR; ++year) {
-//         requests.push({
-//             searchTerm,
-//             year,
-//             attempts: 0,
-//         });
-//     }
-//     return requests;
-// };
-
-// const removePendingRequest = (state: StoreState, searchTerm: string, year: number) => {
-//     state.pendingDiseaseRequests = remove(state.pendingDiseaseRequests, (request) =>
-//         request.searchTerm === searchTerm && request.year === year
-//     );
-// }
-
-// const incrementRequestAttempt = (state: StoreState, searchTerm: string, year: number): boolean => {
-//     const index = findIndex(state.pendingDiseaseRequests, (request) =>
-//         request.searchTerm === searchTerm && request.year === year
-//     );
-//     state.pendingDiseaseRequests[index].attempts++;
-//     return state.pendingDiseaseRequests[index].attempts < REQUEST_MAX_ATTEMPTS;
-// }
-*/
