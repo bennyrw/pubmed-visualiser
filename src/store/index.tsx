@@ -1,4 +1,4 @@
-import { PendingDiseaseRequest, TrendData } from '../types';
+import { PublicationData } from '../types';
 import { DEBUG } from '../constants';
 
 export interface StoreState {
@@ -7,25 +7,20 @@ export interface StoreState {
      */
     searchTerm?: string;
     /**
-     * Any pending disease requests that we're waiting on.
+     * Trend data that we've received so far.
      */
-    pendingDiseaseRequests: PendingDiseaseRequest[];
-    /**
-     * Trend data, if we've received any.
-     */
-    trendData: TrendData;
+    publicationData: PublicationData;
 }
 
 export function getInitialState(): StoreState {
     const state: StoreState = {
-        pendingDiseaseRequests: [],
-        trendData: {}
+        publicationData: {}
     };
 
     // Support various debugging behaviours. Useful when getting layout right while the app is in particular states.
     if (DEBUG.MOCK_TREND_DATA) {
         state.searchTerm = 'COVID-19';
-        state.trendData = {
+        state.publicationData = {
             2018: { articleCount: 0 },
             2019: { articleCount: 5 },
             2020: { articleCount: 500 },

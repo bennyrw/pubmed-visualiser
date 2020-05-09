@@ -1,18 +1,11 @@
-import { remove, findIndex } from 'lodash';
-
 import {
-    Action, FETCH_DATA, FETCH_DATA_SUCCEEDED, FETCH_DATA_FAILED,
-    FetchDataAction, FetchDataSucceededAction, FetchDataFailedAction,
+    Action, FetchOptions,
+    START_FETCH_DATA, StartFetchDataAction,
+    FETCH_YEAR_DATA_SUCCEEDED, FetchYearDataSucceededAction,
+    FETCH_YEAR_DATA_FAILED, FetchYearDataFailedAction,
 } from '../actions/index';
 import { getInitialState, StoreState } from '../store';
-import { PendingDiseaseRequest, YearData } from '../types';
-
-// todo - user configurable... double-ended slider? also need to consider data + view variants of min/max for this
-const EARLIEST_YEAR = 2012;
-const LATEST_YEAR = new Date().getFullYear();
-
-// todo - move to constants
-const REQUEST_MAX_ATTEMPTS = 3;
+import { YearData } from '../types';
 
 /**
  * Redux reducer that updates the store state with the consequences of an action.
@@ -22,58 +15,26 @@ const REQUEST_MAX_ATTEMPTS = 3;
  */
 export function reducer(state = getInitialState(), action: Action): StoreState {
     switch (action.type) {
-        case FETCH_DATA: {
-            const { payload: { searchTerm } } = action as FetchDataAction;
+        case START_FETCH_DATA: {
+            const { payload: { searchTerm } } = action as StartFetchDataAction;
             return {
                 ...state,
                 searchTerm,
-                pendingDiseaseRequests: makePendingDiseaseRequests(searchTerm),
             };
         }
-        case FETCH_DATA_SUCCEEDED: {
-            const { payload: { searchTerm, year, data } } = action as FetchDataSucceededAction;
-            removePendingRequest(state, searchTerm, year);
-            addReceivedYearData(state, year, data);
+        case FETCH_YEAR_DATA_SUCCEEDED: {
+            const { payload: { fetchOptions, data } } = action as FetchYearDataSucceededAction;
+            addReceivedYearData(state, fetchOptions, data);
             return state;
         }
-        case FETCH_DATA_FAILED: {
-            const { payload: { searchTerm, year } } = action as FetchDataFailedAction;
-            const exceededRetries = incrementRequestAttempt(state, searchTerm, year);
-            if (exceededRetries) {
-                removePendingRequest(state, searchTerm, year);
-            }
+        case FETCH_YEAR_DATA_FAILED: {
+            const { payload: { searchTerm, year } } = action as FetchYearDataFailedAction;
+            // todo - maybe set missing flag or something on it?
             return state;
         }
     }
     return state;
 }
 
-const makePendingDiseaseRequests = (searchTerm: string): PendingDiseaseRequest[] => {
-    const requests = [];
-    for (let year = EARLIEST_YEAR; year <= LATEST_YEAR; ++year) {
-        requests.push({
-            searchTerm,
-            year,
-            attempts: 0,
-        });
-    }
-    return requests;
-};
-
-const removePendingRequest = (state: StoreState, searchTerm: string, year: number) => {
-    state.pendingDiseaseRequests = remove(state.pendingDiseaseRequests, (request) =>
-        request.searchTerm === searchTerm && request.year === year
-    );
-}
-
-const addReceivedYearData = (state: StoreState, year: number, data: YearData) => {
-    state.trendData[year] = data;
-}
-
-const incrementRequestAttempt = (state: StoreState, searchTerm: string, year: number): boolean => {
-    const index = findIndex(state.pendingDiseaseRequests, (request) =>
-        request.searchTerm === searchTerm && request.year === year
-    );
-    state.pendingDiseaseRequests[index].attempts++;
-    return state.pendingDiseaseRequests[index].attempts < REQUEST_MAX_ATTEMPTS;
-}
+const addReceivedYearData = (state: StoreState, fetchOptions: FetchOptions, data: YearData) =>
+    state.publicationData[fetchOptions.year] = data;

@@ -4,75 +4,82 @@ import { YearData } from '../types';
 // Action constants
 //
 
-export const FETCH_DATA = 'FETCH_DATA';
-type FETCH_DATA = typeof FETCH_DATA;
+export const START_FETCH_DATA = 'START_FETCH_DATA';
+type START_FETCH_DATA = typeof START_FETCH_DATA;
 
-export const FETCH_DATA_SUCCEEDED = 'FETCH_DATA_SUCCEEDED';
-type FETCH_DATA_SUCCEEDED = typeof FETCH_DATA_SUCCEEDED;
+export const FETCH_YEAR_DATA_SUCCEEDED = 'FETCH_YEAR_DATA_SUCCEEDED';
+type FETCH_YEAR_DATA_SUCCEEDED = typeof FETCH_YEAR_DATA_SUCCEEDED;
 
-export const FETCH_DATA_FAILED = 'FETCH_DATA_FAILED';
-type FETCH_DATA_FAILED = typeof FETCH_DATA_FAILED;
+export const FETCH_YEAR_DATA_FAILED = 'FETCH_YEAR_DATA_FAILED';
+type FETCH_YEAR_DATA_FAILED = typeof FETCH_YEAR_DATA_FAILED;
 
 //
 // Action types
 //
+
+export interface FetchOptions {
+    searchTerm: string;
+    year: number;
+}
 
 export interface Action {
     type: any;
     payload?: any;
 }
 
-export interface FetchDataAction extends Action {
-    type: FETCH_DATA;
+export interface StartFetchDataAction extends Action {
+    type: START_FETCH_DATA;
     payload: {
         searchTerm: string;
+        minYear: number;
+        maxYear: number;
     }
-};
+}
 
-export interface FetchDataSucceededAction extends Action {
-    type: FETCH_DATA_SUCCEEDED;
+export interface FetchYearDataSucceededAction extends Action {
+    type: FETCH_YEAR_DATA_SUCCEEDED;
     payload: {
-        searchTerm: string,
-        year: number;
+        fetchOptions: FetchOptions;
         data: YearData;
     }
 }
 
-export interface FetchDataFailedAction extends Action {
-    type: FETCH_DATA_FAILED;
-    payload: {
-        searchTerm: string;
-        year: number;
-    }
+export interface FetchYearDataFailedAction extends Action {
+    type: FETCH_YEAR_DATA_FAILED;
+    payload: FetchOptions;
 }
 
 //
 // Action creators
 //
 
-export function fetchData(searchTerm: string): FetchDataAction {
+export function startFetchData(searchTerm: string, minYear: number, maxYear: number): StartFetchDataAction {
     return {
-        type: FETCH_DATA,
+        type: START_FETCH_DATA,
         payload: {
             searchTerm,
+            minYear,
+            maxYear,
         }
     };
 }
 
-export function fetchDataSucceeded(searchTerm: string, year: number, data: YearData): FetchDataSucceededAction {
+export function fetchYearDataSucceeded(searchTerm: string, year: number, data: YearData): FetchYearDataSucceededAction {
     return {
-        type: FETCH_DATA_SUCCEEDED,
+        type: FETCH_YEAR_DATA_SUCCEEDED,
         payload: {
-            searchTerm,
-            year,
+            fetchOptions: {
+                searchTerm,
+                year,
+            },
             data,
         },
     };
 }
 
-export function fetchDataFailed(searchTerm: string, year: number): FetchDataFailedAction {
+export function fetchYearDataFailed(searchTerm: string, year: number): FetchYearDataFailedAction {
     return {
-        type: FETCH_DATA_FAILED,
+        type: FETCH_YEAR_DATA_FAILED,
         payload: {
             searchTerm,
             year,

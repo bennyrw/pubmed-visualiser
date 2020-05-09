@@ -10,19 +10,19 @@ import Typography from '@material-ui/core/Typography';
 import { makeStyles } from '@material-ui/core/styles';
 
 import { StoreState } from '../store';
-import { TrendData } from '../types';
+import { PublicationData } from '../types';
 import { getText, LOCALE } from '../constants';
 
 interface Props {
-  trendData?: TrendData;
+  publicationData?: PublicationData;
 }
 
 function ResultsPanel(props: Props) {
-  const { trendData } = props;
+  const { publicationData } = props;
   const isSmallScreen = !useMediaQuery('(min-width:800px)');
   const styles = useStyles();
 
-  if (!trendData) {
+  if (!publicationData) {
     return null;
   }
 
@@ -34,9 +34,9 @@ const useStyles = makeStyles((theme) => ({
   // todo
 }));
 
-function mapStateToProps({ trendData }: StoreState) {
+function mapStateToProps({ publicationData }: StoreState) {
   return {
-    trendData,
+    publicationData,
   }
 }
 

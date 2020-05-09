@@ -1,38 +1,45 @@
-import { fork, take, select, call, put, delay } from 'redux-saga/effects';
-import { throttle } from 'lodash';
+import { fork, take, call, put } from 'redux-saga/effects';
+import * as log from 'loglevel';
 
-import { FETCH_DATA, fetchDataSucceeded, fetchDataFailed } from '../actions';
+import {
+    START_FETCH_DATA, StartFetchDataAction,
+    fetchYearDataSucceeded,
+    fetchYearDataFailed,
+} from '../actions';
 import { StoreState } from '../store';
-import { PendingDiseaseRequest } from '../types';
 import { getPublishedArticleData } from '../external/publishedArticleApi';
 
-/**
- * Triggered when pending API requests need to be handled, this saga fetches data from those APIs.
- */
-export function* fetchDataSaga() {
-    while (true) {
-        const {payload} = yield take(FETCH_DATA);
-        yield fork(handleFetch, payload)
-    }
-}
+// todo - move to constants
+const REQUEST_MAX_ATTEMPTS = 3;
 
-function* handlePendingRequests(pendingRequests: PendingDiseaseRequest[]) {
-    if (pendingRequests) {
-        for (let i = 0; i < pendingRequests.length; ++i) {
-            const request = pendingRequests[i];
-            try {
-                const yearData = yield call(getPublishedArticleData, request.searchTerm, request.year);
-                yield put(fetchDataSucceeded(request.searchTerm, request.year, yearData));
-            } catch (e) {
-                yield put(fetchDataFailed(request.searchTerm, request.year))
-            }
+// todo - retry
+// todo - throttle/delay
+
+/**
+ * Saga handling data fetches, triggered when a start fetch action occurs.
+ */
+export function* fetchDataSaga(): Generator {
+    while (true) {
+        const {payload} = (yield take(START_FETCH_DATA)) as StartFetchDataAction;
+        const {searchTerm, minYear, maxYear} = payload;
+
+        for (let year = minYear; year <= maxYear; ++year) {
+            log.debug(`forking fetchYearData for ${year}`);
+            yield fork(fetchYearData, searchTerm, year);
         }
     }
 }
 
-const getPendingRequests = (state: StoreState): PendingDiseaseRequest[] => state.pendingDiseaseRequests;
-
-// todo - need to apply throttling
+function* fetchYearData(searchTerm: string, year: number) {
+    try {
+        const yearData = yield call(getPublishedArticleData, searchTerm, year);
+        log.info(`Successfully got data for ${year}`);
+        yield put(fetchYearDataSucceeded(searchTerm, year, yearData));
+    } catch (e) {
+        log.warn(`Failed to get data for ${year}`);
+        yield put(fetchYearDataFailed(searchTerm, year));
+    }
+}
 
 /**
  * NCBI advertises a maximum of 10 requests per second when using an API key (3 without).
@@ -56,3 +63,32 @@ function retryify(fn: Function, maxAttempts: number) {
         }
     }
 }
+
+// todo
+/*
+// const makePendingDiseaseRequests = (searchTerm: string): PendingDiseaseRequest[] => {
+//     const requests = [];
+//     for (let year = EARLIEST_YEAR; year <= LATEST_YEAR; ++year) {
+//         requests.push({
+//             searchTerm,
+//             year,
+//             attempts: 0,
+//         });
+//     }
+//     return requests;
+// };
+
+// const removePendingRequest = (state: StoreState, searchTerm: string, year: number) => {
+//     state.pendingDiseaseRequests = remove(state.pendingDiseaseRequests, (request) =>
+//         request.searchTerm === searchTerm && request.year === year
+//     );
+// }
+
+// const incrementRequestAttempt = (state: StoreState, searchTerm: string, year: number): boolean => {
+//     const index = findIndex(state.pendingDiseaseRequests, (request) =>
+//         request.searchTerm === searchTerm && request.year === year
+//     );
+//     state.pendingDiseaseRequests[index].attempts++;
+//     return state.pendingDiseaseRequests[index].attempts < REQUEST_MAX_ATTEMPTS;
+// }
+*/

@@ -1,16 +1,4 @@
-/**
- * A pending request from the disease database (e.g. pubmed)
- */
-export interface PendingDiseaseRequest {
-    searchTerm: string;
-    year: number;
-    /**
-     * Number of attempts made for this request.
-     */
-    attempts: number;
-}
-
-export interface TrendData {
+export interface PublicationData {
     [key: number]: YearData;
 }
 

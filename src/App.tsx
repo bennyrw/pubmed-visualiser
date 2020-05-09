@@ -10,38 +10,25 @@ import Loading from './views/Loading';
 import Results from './views/Results';
 
 import { StoreState } from './store';
-import { TrendData, PendingDiseaseRequest } from './types';
+import { PublicationData } from './types';
 import { getText } from './constants';
 
 interface Props {
-  pendingDiseaseRequests: PendingDiseaseRequest[];
-  trendData?: TrendData;
+  publicationData?: PublicationData;
 }
 
 /**
  * Top level UI component.
  */
-function App({ pendingDiseaseRequests, trendData }: Props) {
+function App({ publicationData }: Props) {
   const styles = useStyles();
-  const isFetchingData = pendingDiseaseRequests.length > 0;
   return (
     <Container component="main" maxWidth="xl">
       <Search />
       <div className={styles.resultPanel}>
-        {isFetchingData && <Loading />}
-        {!isFetchingData && trendData && <Results />}
+        {publicationData && <Results />}
       </div>
     </Container>
-  );
-}
-
-type Styles = any;
-
-function renderError(errorKey: string, styles: Styles) {
-  return (
-    <div className={styles.error}>
-      <Alert severity="error">{getText(errorKey)}</Alert>
-    </div>
   );
 }
 
@@ -54,15 +41,11 @@ const useStyles = makeStyles((theme) => ({
     alignItems: 'center',
     overflow: 'hidden',
   },
-  error: {
-    marginTop: theme.spacing(4),
-  }
 }));
 
-function mapStateToProps({ pendingDiseaseRequests, trendData }: StoreState) {
+function mapStateToProps({ publicationData }: StoreState) {
   return {
-    pendingDiseaseRequests,
-    trendData,
+    publicationData,
   }
 }
 
