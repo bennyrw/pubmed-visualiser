@@ -1,3 +1,4 @@
+import { Map } from 'immutable';
 import { min, max, range, sortBy } from 'lodash';
 
 import { PublicationData, Dictionary, YearData } from '../types';
@@ -18,23 +19,23 @@ const DATA_KEY_PREFIX = 'articleCount_';
 export const getArticleCountDataKey = (searchTerm: string) => `${DATA_KEY_PREFIX}${searchTerm}`
 export const getArticleCountLabel = (dataKey: string) => dataKey.substring(DATA_KEY_PREFIX.length);
 
-export const getLineChartData = (publicationData: Dictionary<PublicationData>): ChartData => {
+export const getLineChartData = (publicationData: Map<string, PublicationData>): ChartData => {
     let maxArticleCount = 0;
     const yearDataPointsMap: Dictionary<YearDataPoints> = {};
 
     // first build up a map of yearly data points
-    Object.entries(publicationData).forEach((entry) => {
+    publicationData.entrySeq().forEach((entry) => {
         const searchTerm: string = entry[0];
         const searchPublicationData: PublicationData = entry[1];
 
-        Object.entries(searchPublicationData).forEach((yearDataEntry) => {
-            const year: string = yearDataEntry[0];
+        searchPublicationData.entrySeq().forEach((yearDataEntry) => {
+            const year: number = yearDataEntry[0];
             const yearData: YearData = yearDataEntry[1];
 
             let yearDataPoints = yearDataPointsMap[year];
             if (!yearDataPoints) {
                 yearDataPoints = {
-                    year: parseInt(year, 10),
+                    year,
                 };
                 yearDataPointsMap[year] = yearDataPoints;
             }

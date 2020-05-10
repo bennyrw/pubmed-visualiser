@@ -1,21 +1,25 @@
-import { PublicationData, Dictionary } from '../types';
+import { RecordOf, Map, fromJS, isKeyed } from 'immutable';
+
+import { PublicationData, YearDataProps, makeRecord } from '../types';
 import { DEBUG } from '../constants';
 
-export interface StoreState {
+interface StoreStateProps {
     /**
      * Publication data that we've received so far. Keyed on the search term.
      */
-    publicationData: Dictionary<PublicationData>;
+    publicationData: Map<string, PublicationData>;
 }
 
+export type StoreState = RecordOf<StoreStateProps>;
+
 export function getInitialState(): StoreState {
-    const state: StoreState = {
-        publicationData: {}
-    };
+    let state: StoreState = makeRecord<StoreStateProps>({
+        publicationData: Map<string, PublicationData>(),
+    });
 
     // Support various debugging behaviours. Useful when getting layout right while the app is in particular states.
     if (DEBUG.MOCK_PUBLICATION_DATA) {
-        state.publicationData = {
+        const debugData = {
             'Cancer': {
                 2000: { articleCount: 70000 },
                 2001: { articleCount: 73000 },
@@ -50,7 +54,21 @@ export function getInitialState(): StoreState {
                 2019: { articleCount: 30 },
                 2020: { articleCount: 5000 },
             }
-        };
+        }
+        const reviver = (key: string | number,
+            value: any,
+            path: (string | number)[] | undefined) => {
+            if (isKeyed(value)) {
+                if (path && path.length === 2) {
+                    return makeRecord<YearDataProps>(value.toObject() as YearDataProps);
+                } else {
+                    return value.toOrderedMap();
+                }
+            } else {
+                return value.toList();
+            }
+        }
+        state = state.set('publicationData', fromJS(debugData, reviver));
     }
 
     return state;

@@ -13,6 +13,9 @@ type FETCH_YEAR_DATA_SUCCEEDED = typeof FETCH_YEAR_DATA_SUCCEEDED;
 export const FETCH_YEAR_DATA_FAILED = 'FETCH_YEAR_DATA_FAILED';
 type FETCH_YEAR_DATA_FAILED = typeof FETCH_YEAR_DATA_FAILED;
 
+export const REMOVE_SEARCH_RESULTS = 'REMOVE_SEARCH_RESULTS';
+type REMOVE_SEARCH_RESULTS = typeof REMOVE_SEARCH_RESULTS;
+
 //
 // Action types
 //
@@ -49,6 +52,13 @@ export interface FetchYearDataFailedAction extends Action {
     payload: FetchOptions;
 }
 
+export interface RemoveSearchResultsAction extends Action {
+    type: REMOVE_SEARCH_RESULTS;
+    payload: {
+        searchTerm: string;
+    }
+}
+
 //
 // Action creators
 //
@@ -83,6 +93,15 @@ export function fetchYearDataFailed(searchTerm: string, year: number): FetchYear
         payload: {
             searchTerm,
             year,
+        }
+    }
+}
+
+export function removeSearchResults(searchTerm: string): RemoveSearchResultsAction {
+    return {
+        type: REMOVE_SEARCH_RESULTS,
+        payload: {
+            searchTerm,
         }
     }
 }

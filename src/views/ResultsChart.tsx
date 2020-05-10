@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Map } from 'immutable';
 
 import {
     LineChart, Line, LineProps, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
@@ -7,24 +8,20 @@ import {
 import * as Color from 'color';
 
 import { StoreState } from '../store';
-import { PublicationData, Dictionary } from '../types';
+import { PublicationData } from '../types';
 import { getText, LOCALE } from '../constants';
 import { getLineChartData, getArticleCountDataKey, getArticleCountLabel } from './ResultsChartData';
 
 interface Props {
-    publicationData?: Dictionary<PublicationData>;
+    publicationData: Map<string, PublicationData>;
 }
 
 function ResultsChart(props: Props) {
     const { publicationData } = props;
 
-    if (!publicationData) {
-        return null;
-    }
-
     // create a line for each search term we have
     const allChartData = getLineChartData(publicationData);
-    const allLineProps: Array<LineProps> = Object.entries(publicationData).map((entry) => {
+    const allLineProps: Array<LineProps> = publicationData.entrySeq().toArray().map((entry) => {
         const [searchTerm,] = entry;
         // todo - change colour for each line, need something in state I think as don't want to recompute this every render (e.g. ordering might change or whatever)
         const baseColour = Color.rgb(66, 135, 245);

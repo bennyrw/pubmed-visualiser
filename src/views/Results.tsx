@@ -1,27 +1,31 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Map } from 'immutable';
 
 import { makeStyles } from '@material-ui/core/styles';
 
 import { StoreState } from '../store';
-import { PublicationData, Dictionary } from '../types';
+import { PublicationData } from '../types';
 
 import ResultsChart from './ResultsChart';
+import SearchTermChips from './SearchTermChips';
 
 interface Props {
-  publicationData?: Dictionary<PublicationData>;
+  publicationData: Map<string, PublicationData>;
 }
 
 function ResultsPanel(props: Props) {
   const { publicationData } = props;
   const styles = useStyles();
 
-  if (!publicationData) {
+  const hasPublicationData = publicationData.size > 0;
+  if (!hasPublicationData) {
     return null;
   }
 
   return (
     <div className={styles.resultPanel}>
+      <SearchTermChips />
       <ResultsChart />
     </div>
   );

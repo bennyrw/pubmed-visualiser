@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { Map } from 'immutable';
 
 import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
@@ -8,10 +9,10 @@ import Search from './views/Search';
 import Results from './views/Results';
 
 import { StoreState } from './store';
-import { PublicationData, Dictionary } from './types';
+import { PublicationData } from './types';
 
 interface Props {
-  publicationData?: Dictionary<PublicationData>;
+  publicationData: Map<string, PublicationData>;
 }
 
 /**
@@ -19,8 +20,7 @@ interface Props {
  */
 function App({ publicationData }: Props) {
   const styles = useStyles();
-  // todo - check this is ok, might need to inspect one level deeper
-  const hasPublicationData = publicationData && Object.keys(publicationData).length > 0;
+  const hasPublicationData = publicationData.size > 0;
   return (
     <Container component="main" maxWidth="xl">
       <Search />

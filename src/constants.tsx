@@ -11,7 +11,7 @@ log.setLevel('debug');
  * Toggle various debugging behaviours. Useful when getting layout right while the app is in particular states.
  */
 export const DEBUG = {
-    MOCK_TREND_DATA: false,
+    MOCK_PUBLICATION_DATA: true,
 }
 
 /**
