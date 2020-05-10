@@ -53,7 +53,13 @@ export function getInitialState(): StoreState {
                 2018: { articleCount: 0 },
                 2019: { articleCount: 30 },
                 2020: { articleCount: 5000 },
-            }
+            },
+            'Some really long disease name': {
+                // only over part of the range of 'Cancer'
+                2008: { articleCount: 6000 },
+                2012: { articleCount: 10000 },
+                2016: { articleCount: 12000 },
+            },
         }
         const reviver = (key: string | number,
             value: any,

@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 
 import { StoreState } from '../store';
@@ -15,8 +16,10 @@ interface Props {
  * Component for displaying a list of chips, one for each search conducted.
  */
 function SearchTermChips({ searchTermChips, onDelete }: Props) {
+  const styles = useStyles();
+
   return (
-    <div>
+    <div className={styles.chipPanel}>
       {searchTermChips.map((chip) => (
         <Chip key={chip}
           label={chip}
@@ -26,6 +29,19 @@ function SearchTermChips({ searchTermChips, onDelete }: Props) {
     </div>
   );
 }
+
+const useStyles = makeStyles((theme) => ({
+  chipPanel: {
+    marginBottom: theme.spacing(3),
+    display: 'flex',
+    flexDirection: 'row',
+    justifyContent: 'center',
+    flexWrap: 'wrap',
+    '& > *': {
+      margin: theme.spacing(0.5),
+    },
+  },
+}));
 
 function mapStateToProps(state: StoreState) {
   return {
