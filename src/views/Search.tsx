@@ -17,8 +17,8 @@ interface Props {
 }
 
 // todo - user configurable... double-ended slider? also need to consider data + view variants of min/max for this
-const EARLIEST_YEAR = 2012;
-const LATEST_YEAR = new Date().getFullYear();
+const EARLIEST_YEAR = 2000;
+const LATEST_YEAR = 2019; //new Date().getFullYear();
 
 /**
  * Component for the search icon, input and button.

@@ -19,11 +19,12 @@ interface Props {
  */
 function App({ publicationData }: Props) {
   const styles = useStyles();
+  const hasPublicationData = publicationData && Object.keys(publicationData).length > 0;
   return (
     <Container component="main" maxWidth="xl">
       <Search />
       <div className={styles.resultPanel}>
-        {publicationData && <Results />}
+        {hasPublicationData && <Results />}
       </div>
     </Container>
   );

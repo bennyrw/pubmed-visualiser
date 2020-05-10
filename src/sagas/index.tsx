@@ -13,7 +13,7 @@ import { getPublishedArticleData } from '../external/publishedArticleApi';
  * Stay within this limit.
  * See https://www.ncbi.nlm.nih.gov/books/NBK25497/
  */
-const MAX_REQUESTS_PER_SECOND = 9;
+const MAX_REQUESTS_PER_SECOND = 5;
 
 const MAX_ATTEMPTS_PER_REQUEST = 3;
 /**

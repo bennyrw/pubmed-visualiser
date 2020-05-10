@@ -25,6 +25,7 @@ export const LOCALE = 'en-GB';
  */
 const TEXT: Dictionary<Dictionary<string>> = {
     'en-GB': {
+        'number-of-articles': 'Number of articles'
     }
 };
 

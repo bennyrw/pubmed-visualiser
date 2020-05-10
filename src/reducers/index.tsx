@@ -1,3 +1,5 @@
+import { cloneDeep } from 'lodash';
+
 import {
     Action, FetchOptions,
     START_FETCH_DATA, StartFetchDataAction,
@@ -25,16 +27,19 @@ export function reducer(state = getInitialState(), action: Action): StoreState {
         case FETCH_YEAR_DATA_SUCCEEDED: {
             const { payload: { fetchOptions, data } } = action as FetchYearDataSucceededAction;
             addReceivedYearData(state, fetchOptions, data);
-            return state;
+            return {...state};
         }
         case FETCH_YEAR_DATA_FAILED: {
             //const { payload: { searchTerm, year } } = action as FetchYearDataFailedAction;
             // todo - handle failure? Maybe show an icon or something?
-            return state;
+            return {...state};
         }
     }
     return state;
 }
 
-const addReceivedYearData = (state: StoreState, fetchOptions: FetchOptions, data: YearData) =>
-    state.publicationData[fetchOptions.year] = data;
+const addReceivedYearData = (state: StoreState, fetchOptions: FetchOptions, data: YearData) => {
+    const newData = cloneDeep(state.publicationData);
+    newData[fetchOptions.year] = data;
+    state.publicationData = newData;
+}
