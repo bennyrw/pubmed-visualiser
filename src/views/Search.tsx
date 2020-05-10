@@ -12,7 +12,6 @@ import { StoreState } from '../store';
 import { startFetchData } from '../actions';
 
 interface Props {
-  searchTerm?: string;
   onSearch: (searchTerm: string) => void;
 }
 
@@ -24,7 +23,7 @@ const LATEST_YEAR = 2019; //new Date().getFullYear();
  * Component for the search icon, input and button.
  */
 function Search(props: Props) {
-  const [searchTerm, setSearchTerm] = React.useState(props.searchTerm || '');
+  const [searchTerm, setSearchTerm] = React.useState('');
 
   const onChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -91,10 +90,8 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function mapStateToProps({ searchTerm }: StoreState) {
-  return {
-    searchTerm,
-  }
+function mapStateToProps(state: StoreState) {
+  return {}
 }
 
 function mapDispatchToProps(dispatch: any) {

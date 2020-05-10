@@ -8,10 +8,10 @@ import Search from './views/Search';
 import Results from './views/Results';
 
 import { StoreState } from './store';
-import { PublicationData } from './types';
+import { PublicationData, Dictionary } from './types';
 
 interface Props {
-  publicationData?: PublicationData;
+  publicationData?: Dictionary<PublicationData>;
 }
 
 /**
@@ -19,6 +19,7 @@ interface Props {
  */
 function App({ publicationData }: Props) {
   const styles = useStyles();
+  // todo - check this is ok, might need to inspect one level deeper
   const hasPublicationData = publicationData && Object.keys(publicationData).length > 0;
   return (
     <Container component="main" maxWidth="xl">
