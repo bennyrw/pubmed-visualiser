@@ -3,8 +3,11 @@ import { connect } from 'react-redux';
 import { Map } from 'immutable';
 
 import {
-    LineChart, Line, LineProps, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
+    LineChart, Line, LineProps, XAxis, YAxis, Label, CartesianGrid, Tooltip, Legend,
+    ResponsiveContainer
 } from 'recharts';
+import Typography from '@material-ui/core/Typography';
+
 import { StoreState, DiseaseData } from '../types';
 import { getText, LOCALE } from '../constants';
 import { getLineChartData, getArticleCountDataKey, getArticleCountLabel } from './ResultsChartData';
@@ -34,17 +37,24 @@ function ResultsChart(props: Props) {
         };
     });
 
+    const axisAndLegendFontProps = {
+        fontFamily: 'roboto',
+        fontSize: '0.8em'
+    }
+
     return (
         <div style={{ width: '100%', height: 300 }}>
             <ResponsiveContainer>
                 <LineChart data={allChartData.yearDataPoints}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="year" />
+                    <XAxis dataKey="year" tick={{ ...axisAndLegendFontProps }} />
                     <YAxis width={90}
+                        tick={{ ...axisAndLegendFontProps }}
                         label={{
                             value: getText('number-of-articles', LOCALE),
                             angle: -90,
                             position: 'insideLeft',
+                            ...axisAndLegendFontProps,
                         }}
                         domain={
                             // Recharts doesn't seem to work properly if we leave the domain as [0, 'auto'] so manually set the y-axis domain
@@ -54,9 +64,11 @@ function ResultsChart(props: Props) {
                     <Tooltip formatter={(value, name/*, props*/) => {
                         return [value, getArticleCountLabel(name)];
                     }} />
-                    <Legend formatter={(value/*, entry, index*/) => {
-                        return `${getArticleCountLabel(value)}`
-                    }} />
+                    <Legend formatter={(value/*, entry, index*/) =>
+                        <Typography variant='caption'>
+                            {getArticleCountLabel(value)}
+                        </Typography>
+                    } />
                     {allLineProps.map((lineProps: LineProps) =>
                         <Line connectNulls
                             type="monotone"
