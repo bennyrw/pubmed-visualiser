@@ -1,8 +1,14 @@
-import { parse } from 'query-string';
+import { parse, ParseOptions } from 'query-string';
 
 import { DEFAULT_LOCALE } from './i18n';
 
 interface Config {
+    /**
+     * Initial seaches to make.
+     */
+    searchTerms: string[];
+    searchEarliestYear: number;
+    searchLatestYear: number;
     /**
      * Log level.
      */
@@ -19,6 +25,9 @@ interface Config {
 
 const getDefaults = (): Config => {
     return {
+        searchTerms: [],
+        searchEarliestYear: new Date().getFullYear() - 20,
+        searchLatestYear: new Date().getFullYear(),
         logLevel: 'info',
         locale: DEFAULT_LOCALE,
         mockPublicationData: false,
@@ -33,8 +42,26 @@ const getConfig = (): Config => {
 
     const queryString = window && window.location ? window.location.search : null;
     if (queryString) {
-        const parseOptions = { parseBooleans: true };
-        const { locale, debug } = parse(queryString.toLowerCase(), parseOptions);
+        const parseOptions: ParseOptions = {
+            parseBooleans: true,
+            arrayFormat: 'separator',
+            arrayFormatSeparator: '|',
+        };
+        const { q, from, to, locale, debug } = parse(queryString.toLowerCase(), parseOptions);
+        if (q) {
+            if (typeof q === 'string') {
+                // single term
+                config.searchTerms = [q];
+            } else if (q instanceof Array) {
+                config.searchTerms = q;
+            }
+        }
+        if (from && typeof from === 'number') {
+            config.searchEarliestYear = from;
+        }
+        if (to && typeof to === 'number') {
+            config.searchLatestYear = to;
+        }
         if (debug && typeof debug === 'boolean') {
             config.logLevel = 'debug';
             config.mockPublicationData = true;

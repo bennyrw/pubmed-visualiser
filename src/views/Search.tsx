@@ -8,16 +8,13 @@ import SearchIcon from '@material-ui/icons/Search';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { makeStyles } from '@material-ui/core/styles';
 
+import { config } from '../config';
 import { StoreState } from '../types';
 import { startFetchData } from '../actions';
 
 interface Props {
   onSearch: (searchTerm: string) => void;
 }
-
-// todo - user configurable... double-ended slider? also need to consider data + view variants of min/max for this
-const EARLIEST_YEAR = 2000;
-const LATEST_YEAR = 2019; //new Date().getFullYear();
 
 /**
  * Component for the search icon, input and button.
@@ -97,7 +94,7 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: any) {
   return {
-    onSearch: (searchTerm: string) => dispatch(startFetchData(searchTerm, EARLIEST_YEAR, LATEST_YEAR)),
+    onSearch: (searchTerm: string) => dispatch(startFetchData(searchTerm, config.searchEarliestYear, config.searchLatestYear)),
   }
 }
 

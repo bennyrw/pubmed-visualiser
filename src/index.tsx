@@ -10,7 +10,7 @@ import App from './App';
 import { reducer } from './reducers';
 import { getInitialState } from './store';
 import { StoreState } from './types';
-import { Action } from './actions';
+import { Action, startFetchData } from './actions';
 import { fetchDataSaga } from './sagas';
 
 // workaround typescript check as LogLevelDesc isn't exported from 'loglevel'
@@ -22,6 +22,13 @@ const store = createStore<StoreState, Action, any, any>(reducer,
   initialState,
   applyMiddleware(sagaMiddleware));
 
+sagaMiddleware.run(fetchDataSaga);
+
+// schedule initial searches
+config.searchTerms.forEach(searchTerm => {
+  store.dispatch(startFetchData(searchTerm, config.searchEarliestYear, config.searchLatestYear));
+});
+
 ReactDOM.render(
   <React.StrictMode>
     <Provider store={store}>
@@ -30,5 +37,3 @@ ReactDOM.render(
   </React.StrictMode>,
   document.getElementById('root')
 );
-
-sagaMiddleware.run(fetchDataSaga);
