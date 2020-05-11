@@ -1,11 +1,11 @@
-import { Map, fromJS, isKeyed } from 'immutable';
+import { OrderedMap, fromJS, isKeyed } from 'immutable';
 
 import { StoreState, StoreStateFields, DiseaseData, DiseaseDataFields, YearDataFields, makeRecord } from '../types';
 import { config } from '../config';
 
 export function getInitialState(): StoreState {
     let state: StoreState = makeRecord<StoreStateFields>({
-        diseaseData: Map<string, DiseaseData>(),
+        diseaseData: OrderedMap<string, DiseaseData>(),
     });
 
     // Support various debugging behaviours. Useful when getting layout right while the app is in particular states.
@@ -81,7 +81,7 @@ export function getInitialState(): StoreState {
                 return value.toList();
             }
         }
-        state = state.set('diseaseData', fromJS(debugData, reviver));
+        state = state.set('diseaseData', OrderedMap(fromJS(debugData, reviver)));
     }
 
     return state;
