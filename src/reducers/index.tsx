@@ -7,8 +7,8 @@ import {
     FETCH_YEAR_DATA_FAILED, FetchYearDataFailedAction,
     REMOVE_SEARCH_RESULTS, RemoveSearchResultsAction,
 } from '../actions/index';
-import { getInitialState, StoreState } from '../store';
-import { YearData } from '../types';
+import { getInitialState } from '../store';
+import { StoreState, DiseaseDataFields, YearData, makeRecord } from '../types';
 
 /**
  * Redux reducer that updates the store state with the consequences of an action.
@@ -20,7 +20,7 @@ export function reducer(state = getInitialState(), action: Action): StoreState {
     switch (action.type) {
         case START_FETCH_DATA: {
             const { payload: { searchTerm } } = action as StartFetchDataAction;
-            return addOrReplaceNewSearchTermData(state, searchTerm);
+            return resetDiseaseData(state, searchTerm);
         }
         case FETCH_YEAR_DATA_SUCCEEDED: {
             const { payload: { fetchOptions, data } } = action as FetchYearDataSucceededAction;
@@ -33,20 +33,22 @@ export function reducer(state = getInitialState(), action: Action): StoreState {
         }
         case REMOVE_SEARCH_RESULTS: {
             const { payload: { searchTerm } } = action as RemoveSearchResultsAction;
-            return removeSearchResults(state, searchTerm);
+            return removeDiseaseData(state, searchTerm);
         }
     }
     return state;
 }
 
-const addOrReplaceNewSearchTermData = (state: StoreState, searchTerm: string): StoreState => {
-    return state.setIn(['publicationData', searchTerm], Map());
+const resetDiseaseData = (state: StoreState, searchTerm: string): StoreState => {
+    return state.setIn(['diseaseData', searchTerm], makeRecord<DiseaseDataFields>({
+        publicationData: Map()
+    }));
 }
 
 const addReceivedYearData = (state: StoreState, fetchOptions: FetchOptions, data: YearData) => {
-    return state.setIn(['publicationData', fetchOptions.searchTerm, fetchOptions.year], data);
+    return state.setIn(['diseaseData', fetchOptions.searchTerm, 'publicationData', fetchOptions.year], data);
 }
 
-const removeSearchResults = (state: StoreState, searchTerm: string) => {
-    return state.deleteIn(['publicationData', searchTerm]);
+const removeDiseaseData = (state: StoreState, searchTerm: string) => {
+    return state.deleteIn(['diseaseData', searchTerm]);
 }

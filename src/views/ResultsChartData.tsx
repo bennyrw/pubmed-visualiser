@@ -1,7 +1,7 @@
 import { Map } from 'immutable';
 import { min, max, range, sortBy } from 'lodash';
 
-import { PublicationData, Dictionary, YearData } from '../types';
+import { PublicationData, Dictionary, YearData, DiseaseData } from '../types';
 
 interface YearDataPoints {
     year: number;
@@ -19,16 +19,19 @@ const DATA_KEY_PREFIX = 'articleCount_';
 export const getArticleCountDataKey = (searchTerm: string) => `${DATA_KEY_PREFIX}${searchTerm}`
 export const getArticleCountLabel = (dataKey: string) => dataKey.substring(DATA_KEY_PREFIX.length);
 
-export const getLineChartData = (publicationData: Map<string, PublicationData>): ChartData => {
+/**
+ * Get the data points to use in the chart, covering all disease areas the user has searched for.
+ */
+export const getLineChartData = (diseaseData: Map<string, DiseaseData>): ChartData => {
     let maxArticleCount = 0;
     const yearDataPointsMap: Dictionary<YearDataPoints> = {};
 
     // first build up a map of yearly data points
-    publicationData.entrySeq().forEach((entry) => {
+    diseaseData.entrySeq().forEach((entry) => {
         const searchTerm: string = entry[0];
-        const searchPublicationData: PublicationData = entry[1];
+        const diseaseData: DiseaseData = entry[1];
 
-        searchPublicationData.entrySeq().forEach((yearDataEntry) => {
+        diseaseData.publicationData.entrySeq().forEach((yearDataEntry) => {
             const year: number = yearDataEntry[0];
             const yearData: YearData = yearDataEntry[1];
 

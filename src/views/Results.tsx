@@ -4,22 +4,20 @@ import { Map } from 'immutable';
 
 import { makeStyles } from '@material-ui/core/styles';
 
-import { StoreState } from '../store';
-import { PublicationData } from '../types';
+import { StoreState, DiseaseData } from '../types';
 
 import ResultsChart from './ResultsChart';
 import SearchTermChips from './SearchTermChips';
 
 interface Props {
-  publicationData: Map<string, PublicationData>;
+  diseaseData: Map<string, DiseaseData>;
 }
 
 function ResultsPanel(props: Props) {
-  const { publicationData } = props;
+  const { diseaseData } = props;
   const styles = useStyles();
 
-  const hasPublicationData = publicationData.size > 0;
-  if (!hasPublicationData) {
+  if (diseaseData.size === 0) {
     return null;
   }
 
@@ -40,9 +38,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-function mapStateToProps({ publicationData }: StoreState) {
+function mapStateToProps({ diseaseData }: StoreState) {
   return {
-    publicationData,
+    diseaseData,
   }
 }
 

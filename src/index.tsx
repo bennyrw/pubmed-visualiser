@@ -6,7 +6,8 @@ import createSagaMiddleware from 'redux-saga';
 
 import App from './App';
 import { reducer } from './reducers';
-import { StoreState, getInitialState } from './store';
+import { getInitialState } from './store';
+import { StoreState } from './types';
 import { Action } from './actions';
 import { fetchDataSaga } from './sagas';
 

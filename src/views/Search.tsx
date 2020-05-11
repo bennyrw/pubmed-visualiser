@@ -8,7 +8,7 @@ import SearchIcon from '@material-ui/icons/Search';
 import AssignmentIcon from '@material-ui/icons/Assignment';
 import { makeStyles } from '@material-ui/core/styles';
 
-import { StoreState } from '../store';
+import { StoreState } from '../types';
 import { startFetchData } from '../actions';
 
 interface Props {

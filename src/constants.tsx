@@ -5,13 +5,13 @@ import { Dictionary } from './types';
 /**
  * Set the log level. Ideally this would be via a URL query parameter.
  */
-log.setLevel('debug');
+log.setLevel('info');
 
 /**
  * Toggle various debugging behaviours. Useful when getting layout right while the app is in particular states.
  */
 export const DEBUG = {
-    MOCK_PUBLICATION_DATA: true,
+    MOCK_PUBLICATION_DATA: false,
 }
 
 /**

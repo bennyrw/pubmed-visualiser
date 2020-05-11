@@ -4,7 +4,7 @@ import { connect } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 
-import { StoreState } from '../store';
+import { StoreState } from '../types';
 import { removeSearchResults } from '../actions';
 
 interface Props {
@@ -19,9 +19,11 @@ function SearchTermChips({ searchTermChips, onDelete }: Props) {
   const styles = useStyles();
 
   return (
+    // todo - colours
     <div className={styles.chipPanel}>
       {searchTermChips.map((chip) => (
         <Chip key={chip}
+          style={{ backgroundColor: '#ff00ff' }}
           label={chip}
           color="primary"
           onDelete={onDelete.bind(null, chip)} />
@@ -45,7 +47,7 @@ const useStyles = makeStyles((theme) => ({
 
 function mapStateToProps(state: StoreState) {
   return {
-    searchTermChips: state.publicationData.keySeq().toArray(),
+    searchTermChips: state.diseaseData.keySeq().toArray(),
   }
 }
 

@@ -7,23 +7,22 @@ import {
 } from 'recharts';
 import * as Color from 'color';
 
-import { StoreState } from '../store';
-import { PublicationData } from '../types';
+import { StoreState, DiseaseData } from '../types';
 import { getText, LOCALE } from '../constants';
 import { getLineChartData, getArticleCountDataKey, getArticleCountLabel } from './ResultsChartData';
 
 interface Props {
-    publicationData: Map<string, PublicationData>;
+    diseaseData: Map<string, DiseaseData>;
 }
 
 function ResultsChart(props: Props) {
-    const { publicationData } = props;
+    const { diseaseData } = props;
 
     // create a line for each search term we have
-    const allChartData = getLineChartData(publicationData);
-    const allLineProps: Array<LineProps> = publicationData.entrySeq().toArray().map((entry) => {
+    const allChartData = getLineChartData(diseaseData);
+    const allLineProps: Array<LineProps> = diseaseData.entrySeq().toArray().map((entry) => {
         const [searchTerm,] = entry;
-        // todo - change colour for each line, need something in state I think as don't want to recompute this every render (e.g. ordering might change or whatever)
+        // todo - colours
         const baseColour = Color.rgb(66, 135, 245);
         return {
             key: searchTerm, // React's unique rendering key
@@ -71,9 +70,9 @@ function ResultsChart(props: Props) {
     );
 }
 
-function mapStateToProps({ publicationData }: StoreState) {
+function mapStateToProps({ diseaseData }: StoreState) {
     return {
-        publicationData,
+        diseaseData,
     }
 }
 

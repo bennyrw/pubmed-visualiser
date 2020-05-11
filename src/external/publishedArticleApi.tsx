@@ -1,4 +1,4 @@
-import { YearData, YearDataProps, makeRecord } from '../types';
+import { YearData, YearDataFields, makeRecord } from '../types';
 
 /**
  * Get data for a specific search term and year.
@@ -12,7 +12,7 @@ export async function getPublishedArticleData(searchTerm: string, year: number):
         //const historyKey = result.webenv; // todo - use this for more info
         const articleCount = result.count;
 
-        return makeRecord<YearDataProps>({
+        return makeRecord<YearDataFields>({
             articleCount,
         });
     } catch (e) {

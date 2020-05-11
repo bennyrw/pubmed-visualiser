@@ -8,19 +8,18 @@ import { makeStyles } from '@material-ui/core/styles';
 import Search from './views/Search';
 import Results from './views/Results';
 
-import { StoreState } from './store';
-import { PublicationData } from './types';
+import { StoreState, DiseaseData } from './types';
 
 interface Props {
-  publicationData: Map<string, PublicationData>;
+  diseaseData: Map<string, DiseaseData>;
 }
 
 /**
  * Top level UI component.
  */
-function App({ publicationData }: Props) {
+function App({ diseaseData }: Props) {
   const styles = useStyles();
-  const hasPublicationData = publicationData.size > 0;
+  const hasPublicationData = diseaseData.size > 0;
   return (
     <Container component="main" maxWidth="xl">
       <Search />
@@ -42,9 +41,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function mapStateToProps({ publicationData }: StoreState) {
+function mapStateToProps({ diseaseData }: StoreState) {
   return {
-    publicationData,
+    diseaseData,
   }
 }
 
