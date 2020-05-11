@@ -33,7 +33,8 @@ export function getInitialState(): StoreState {
                     2017: { articleCount: 207000 },
                     2018: { articleCount: 214000 },
                     2019: { articleCount: 213000 },
-                }
+                },
+                activeSearchSlot: 0,
             },
             'Spanish flu': {
                 publicationData: {
@@ -41,7 +42,8 @@ export function getInitialState(): StoreState {
                     1920: { articleCount: 10 },
                     1925: { articleCount: 15 },
                     1930: { articleCount: 0 },
-                }
+                },
+                activeSearchSlot: 1,
             },
             'COVID-19': {
                 publicationData: {
@@ -49,7 +51,8 @@ export function getInitialState(): StoreState {
                     2018: { articleCount: 0 },
                     2019: { articleCount: 30 },
                     2020: { articleCount: 5000 },
-                }
+                },
+                activeSearchSlot: 2,
             },
             'Some really long disease name': {
                 publicationData: {
@@ -57,7 +60,8 @@ export function getInitialState(): StoreState {
                     2008: { articleCount: 6000 },
                     2012: { articleCount: 10000 },
                     2016: { articleCount: 12000 },
-                }
+                },
+                activeSearchSlot: 3,
             },
         }
         const reviver = (key: string | number,

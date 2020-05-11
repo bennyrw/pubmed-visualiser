@@ -1,32 +1,38 @@
 import React from 'react';
 import { connect } from 'react-redux';
 
+import * as Color from 'color';
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
 
-import { StoreState } from '../types';
+import { getSearchBaseColour } from './SearchSlotColour';
+import { StoreState, DiseaseData } from '../types';
 import { removeSearchResults } from '../actions';
 
+interface ChipInfo {
+  label: string;
+  baseColour: Color;
+}
+
 interface Props {
-  searchTermChips: string[];
+  chipInfo: ChipInfo[];
   onDelete: (searchTerm: string) => void;
 }
 
 /**
  * Component for displaying a list of chips, one for each search conducted.
  */
-function SearchTermChips({ searchTermChips, onDelete }: Props) {
+function SearchTermChips({ chipInfo, onDelete }: Props) {
   const styles = useStyles();
 
   return (
-    // todo - colours
     <div className={styles.chipPanel}>
-      {searchTermChips.map((chip) => (
-        <Chip key={chip}
-          style={{ backgroundColor: '#ff00ff' }}
-          label={chip}
+      {chipInfo.map((chip) => (
+        <Chip key={chip.label}
+          style={{ backgroundColor: chip.baseColour.hex() }}
+          label={chip.label}
           color="primary"
-          onDelete={onDelete.bind(null, chip)} />
+          onDelete={onDelete.bind(null, chip.label)} />
       ))}
     </div>
   );
@@ -46,8 +52,16 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function mapStateToProps(state: StoreState) {
+  const chipInfo: ChipInfo[] = [];
+  state.diseaseData.forEach((diseaseData: DiseaseData, searchTerm: string) => {
+    chipInfo.push({
+      label: searchTerm,
+      baseColour: getSearchBaseColour(diseaseData.activeSearchSlot),
+    });
+  });
+
   return {
-    searchTermChips: state.diseaseData.keySeq().toArray(),
+    chipInfo,
   }
 }
 

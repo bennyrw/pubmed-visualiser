@@ -1,4 +1,6 @@
+import * as log from 'loglevel';
 import { Map } from 'immutable';
+import { range } from 'lodash';
 
 import {
     Action, FetchOptions,
@@ -8,7 +10,7 @@ import {
     REMOVE_SEARCH_RESULTS, RemoveSearchResultsAction,
 } from '../actions/index';
 import { getInitialState } from '../store';
-import { StoreState, DiseaseDataFields, YearData, makeRecord } from '../types';
+import { StoreState, DiseaseData, DiseaseDataFields, YearData, makeRecord } from '../types';
 
 /**
  * Redux reducer that updates the store state with the consequences of an action.
@@ -41,8 +43,21 @@ export function reducer(state = getInitialState(), action: Action): StoreState {
 
 const resetDiseaseData = (state: StoreState, searchTerm: string): StoreState => {
     return state.setIn(['diseaseData', searchTerm], makeRecord<DiseaseDataFields>({
-        publicationData: Map()
+        publicationData: Map(),
+        activeSearchSlot: findNextAvailableSearchSlot(state),
     }));
+}
+
+const findNextAvailableSearchSlot = (state: StoreState): number => {
+    const usedSlots = state.diseaseData.valueSeq().toList().map((diseaseData: DiseaseData) => diseaseData.activeSearchSlot);
+    let newSlot = 0;
+    if (usedSlots.size > 0) {
+        const highestSlot = usedSlots.max() as number;
+        const allSlots = range(0, highestSlot + 2);
+        newSlot = allSlots.find(n => !usedSlots.contains(n)) as number;
+    }
+    log.debug(`findNextAvailableSearchSlot allocated slot ${newSlot}`);
+    return newSlot;
 }
 
 const addReceivedYearData = (state: StoreState, fetchOptions: FetchOptions, data: YearData) => {

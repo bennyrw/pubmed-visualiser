@@ -13,7 +13,16 @@ export interface StoreStateFields {
  */
 export type DiseaseData = RecordOf<DiseaseDataFields>;
 export interface DiseaseDataFields {
+    /**
+     * Details about publications for this disease.
+     */
     publicationData: PublicationData;
+    /**
+     * A finite number of searches are permitted concurrently (before results must be deleted).
+     * This is the ID of the search 'slot' associated with this disease. It's used for determining
+     * consistent colour throughout the app for this disease.
+     */
+    activeSearchSlot: number;
 }
 
 /**

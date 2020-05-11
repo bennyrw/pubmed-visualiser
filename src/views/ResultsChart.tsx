@@ -5,11 +5,10 @@ import { Map } from 'immutable';
 import {
     LineChart, Line, LineProps, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer
 } from 'recharts';
-import * as Color from 'color';
-
 import { StoreState, DiseaseData } from '../types';
 import { getText, LOCALE } from '../constants';
 import { getLineChartData, getArticleCountDataKey, getArticleCountLabel } from './ResultsChartData';
+import { getSearchBaseColour } from './SearchSlotColour';
 
 interface Props {
     diseaseData: Map<string, DiseaseData>;
@@ -21,9 +20,8 @@ function ResultsChart(props: Props) {
     // create a line for each search term we have
     const allChartData = getLineChartData(diseaseData);
     const allLineProps: Array<LineProps> = diseaseData.entrySeq().toArray().map((entry) => {
-        const [searchTerm,] = entry;
-        // todo - colours
-        const baseColour = Color.rgb(66, 135, 245);
+        const [searchTerm, searchDiseaseData] = entry;
+        const baseColour = getSearchBaseColour(searchDiseaseData.activeSearchSlot);
         return {
             key: searchTerm, // React's unique rendering key
             dataKey: getArticleCountDataKey(searchTerm),
