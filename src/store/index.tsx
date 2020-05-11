@@ -1,7 +1,7 @@
 import { Map, fromJS, isKeyed } from 'immutable';
 
 import { StoreState, StoreStateFields, DiseaseData, DiseaseDataFields, YearDataFields, makeRecord } from '../types';
-import { DEBUG } from '../constants';
+import { config } from '../config';
 
 export function getInitialState(): StoreState {
     let state: StoreState = makeRecord<StoreStateFields>({
@@ -9,7 +9,7 @@ export function getInitialState(): StoreState {
     });
 
     // Support various debugging behaviours. Useful when getting layout right while the app is in particular states.
-    if (DEBUG.MOCK_PUBLICATION_DATA) {
+    if (config.mockPublicationData) {
         const debugData = {
             'Cancer': {
                 publicationData: {

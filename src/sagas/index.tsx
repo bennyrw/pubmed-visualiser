@@ -49,10 +49,10 @@ function* fetchYearData(searchTerm: string, year: number, waitUntil: number) {
 
     try {
         const yearData = yield retry(MAX_ATTEMPTS_PER_REQUEST, DELAY_BETWEEN_FAILURES, getPublishedArticleData, searchTerm, year);
-        log.info(`Successfully got data for ${year}`);
+        log.info(`Successfully got data for '${searchTerm}' in ${year}`);
         yield put(fetchYearDataSucceeded(searchTerm, year, yearData));
     } catch (e) {
-        log.warn(`Failed to get data for ${year}`);
+        log.warn(`Failed to get data for '${searchTerm}' in ${year}`);
         yield put(fetchYearDataFailed(searchTerm, year));
     }
 }

@@ -3,13 +3,13 @@ import { connect } from 'react-redux';
 import { Map } from 'immutable';
 
 import {
-    LineChart, Line, LineProps, XAxis, YAxis, Label, CartesianGrid, Tooltip, Legend,
+    LineChart, Line, LineProps, XAxis, YAxis, CartesianGrid, Tooltip, Legend,
     ResponsiveContainer
 } from 'recharts';
 import Typography from '@material-ui/core/Typography';
 
 import { StoreState, DiseaseData } from '../types';
-import { getText, LOCALE } from '../constants';
+import { getText } from '../i18n';
 import { getLineChartData, getArticleCountDataKey, getArticleCountLabel } from './ResultsChartData';
 import { getSearchBaseColour } from './SearchSlotColour';
 
@@ -38,7 +38,7 @@ function ResultsChart(props: Props) {
     });
 
     const axisAndLegendFontProps = {
-        fontFamily: 'roboto',
+        fontFamily: 'roboto, sans-serif',
         fontSize: '0.8em'
     }
 
@@ -51,7 +51,7 @@ function ResultsChart(props: Props) {
                     <YAxis width={90}
                         tick={{ ...axisAndLegendFontProps }}
                         label={{
-                            value: getText('number-of-articles', LOCALE),
+                            value: getText('number-of-articles'),
                             angle: -90,
                             position: 'insideLeft',
                             ...axisAndLegendFontProps,
