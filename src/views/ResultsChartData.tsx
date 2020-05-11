@@ -1,7 +1,7 @@
 import { Map } from 'immutable';
 import { min, max, range, sortBy } from 'lodash';
 
-import { PublicationData, Dictionary, YearData, DiseaseData } from '../types';
+import { Dictionary, YearData, DiseaseData } from '../types';
 
 interface YearDataPoints {
     year: number;
