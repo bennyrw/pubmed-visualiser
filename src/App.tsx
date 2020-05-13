@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { connect } from 'react-redux';
 import { Map } from 'immutable';
 
@@ -9,6 +9,7 @@ import Search from './views/Search';
 import Results from './views/Results';
 
 import { StoreState, DiseaseData } from './types';
+import { getUrlHash } from './config';
 
 interface Props {
   diseaseData: Map<string, DiseaseData>;
@@ -19,6 +20,12 @@ interface Props {
  */
 function App({ diseaseData }: Props) {
   const styles = useStyles();
+
+  useEffect(() => {
+    const searches = diseaseData.keySeq();
+    window.location.hash = getUrlHash(searches.toArray());
+  });
+
   const hasPublicationData = diseaseData.size > 0;
   return (
     <Container component="main" maxWidth="xl">
