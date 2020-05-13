@@ -1,8 +1,10 @@
-import { fork, take, put, delay, retry } from 'redux-saga/effects';
+import { fork, take, put, delay, retry, cancel } from 'redux-saga/effects';
+import { Task } from 'redux-saga';
 import * as log from 'loglevel';
 
 import {
     START_FETCH_DATA, StartFetchDataAction,
+    REMOVE_SEARCH_RESULTS, RemoveSearchResultsAction,
     fetchYearDataSucceeded,
     fetchYearDataFailed,
 } from '../actions';
@@ -32,10 +34,21 @@ export function* fetchDataSaga(): Generator {
 
         const delayBetweenRequests = 1000 / MAX_REQUESTS_PER_SECOND;
         let waitUntil: number = Date.now();
+        const tasks: Task[] = [];
         for (let year = minYear; year <= maxYear; ++year) {
-            log.debug(`forking fetchYearData for ${year}`);
-            yield fork(fetchYearData, searchTerm, year, waitUntil);
+            log.debug(`forking fetchYearData for '${searchTerm}' in  ${year}`);
+            const task = (yield fork(fetchYearData, searchTerm, year, waitUntil)) as Task;
+            tasks.push(task);
             waitUntil += delayBetweenRequests;
+        }
+
+        // wait for a cancellation
+        const {payload: removePayload} = (yield take(REMOVE_SEARCH_RESULTS)) as RemoveSearchResultsAction;
+        if (removePayload.searchTerm === searchTerm) {
+            for (let i = 0; i < tasks.length; ++i) {
+                log.debug(`cancelling fetchYearData task for '${searchTerm}' in position ${i}`);
+                yield cancel(tasks[i]);
+            }
         }
     }
 }
