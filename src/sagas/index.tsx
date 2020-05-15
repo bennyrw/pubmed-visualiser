@@ -3,12 +3,14 @@ import { Task } from 'redux-saga';
 import * as log from 'loglevel';
 
 import {
+    Action,
     START_FETCH_DATA, StartFetchDataAction,
     REMOVE_SEARCH_RESULTS, RemoveSearchResultsAction,
     fetchYearDataSucceeded,
     fetchYearDataFailed,
 } from '../actions';
 import { getPublishedArticleData } from '../external/publishedArticleApi';
+import { Dictionary } from '../types'
 
 /**
  * NCBI advertises a maximum of 10 requests per second when using an API key (3 without).
@@ -28,26 +30,38 @@ const DELAY_BETWEEN_FAILURES = 1000;
  * Handles rate limiting and retrying.
  */
 export function* fetchDataSaga(): Generator {
+    const tasks: Dictionary<Task[]> = {};
+
     while (true) {
-        const {payload} = (yield take(START_FETCH_DATA)) as StartFetchDataAction;
-        const {searchTerm, minYear, maxYear} = payload;
+        const action = (yield take([
+            START_FETCH_DATA,
+            REMOVE_SEARCH_RESULTS,
+        ])) as Action;
 
-        const delayBetweenRequests = 1000 / MAX_REQUESTS_PER_SECOND;
-        let waitUntil: number = Date.now();
-        const tasks: Task[] = [];
-        for (let year = minYear; year <= maxYear; ++year) {
-            log.debug(`forking fetchYearData for '${searchTerm}' in  ${year}`);
-            const task = (yield fork(fetchYearData, searchTerm, year, waitUntil)) as Task;
-            tasks.push(task);
-            waitUntil += delayBetweenRequests;
-        }
+        if (action.type === START_FETCH_DATA) {
+            const {payload} = action as StartFetchDataAction;
+            const { searchTerm, minYear, maxYear } = payload;
+            const delayBetweenRequests = 1000 / MAX_REQUESTS_PER_SECOND;
+            let waitUntil: number = Date.now();
+            for (let year = minYear; year <= maxYear; ++year) {
+                log.debug(`forking fetchYearData for '${searchTerm}' in  ${year}`);
+                const task = (yield fork(fetchYearData, searchTerm, year, waitUntil)) as Task;
 
-        // wait for a cancellation
-        const {payload: removePayload} = (yield take(REMOVE_SEARCH_RESULTS)) as RemoveSearchResultsAction;
-        if (removePayload.searchTerm === searchTerm) {
-            for (let i = 0; i < tasks.length; ++i) {
-                log.debug(`cancelling fetchYearData task for '${searchTerm}' in position ${i}`);
-                yield cancel(tasks[i]);
+                let searchTermTasks = tasks[searchTerm];
+                if (!searchTermTasks) {
+                    searchTermTasks = [];
+                    tasks[searchTerm] = searchTermTasks;
+                }
+                searchTermTasks.push(task);
+
+                waitUntil += delayBetweenRequests;
+            }
+        } else if (action.type === REMOVE_SEARCH_RESULTS) {
+            const {payload} = action as RemoveSearchResultsAction;
+            const searchTermTasks = tasks[payload.searchTerm];
+            for (let i = 0; i < searchTermTasks.length; ++i) {
+                log.debug(`cancelling fetchYearData task for '${payload.searchTerm}' in position ${i}`);
+                yield cancel(searchTermTasks[i]);
             }
         }
     }
