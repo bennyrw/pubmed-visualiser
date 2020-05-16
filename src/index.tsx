@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
+import { createStore, applyMiddleware, Middleware } from 'redux';
 import createSagaMiddleware from 'redux-saga';
 import * as log from 'loglevel';
 
-import {config} from './config';
+import { config } from './config';
 import App from './App';
 import { reducer } from './reducers';
 import { getInitialState } from './store';
@@ -18,9 +18,16 @@ log.setLevel(config.logLevel as any);
 
 const sagaMiddleware = createSagaMiddleware();
 const initialState = getInitialState();
+const loggingPassThroughMiddleware: Middleware = store => next => action => {
+  log.debug('dispatching', action);
+  let result = next(action);
+  log.debug('next state', store.getState());
+  return result;
+}
+
 const store = createStore<StoreState, Action, any, any>(reducer,
   initialState,
-  applyMiddleware(sagaMiddleware));
+  applyMiddleware(loggingPassThroughMiddleware, sagaMiddleware));
 
 sagaMiddleware.run(fetchDataSaga);
 
