@@ -47,7 +47,7 @@ const getConfig = (): Config => {
             arrayFormat: 'separator',
             arrayFormatSeparator: '|',
         };
-        const { q, from, to, locale, debug } = parse(urlHash.toLowerCase(), parseOptions);
+        const { q, from, to, locale, debug, mockData } = parse(urlHash.toLowerCase(), parseOptions);
         if (q) {
             if (typeof q === 'string') {
                 // single term
@@ -64,6 +64,8 @@ const getConfig = (): Config => {
         }
         if (debug && typeof debug === 'boolean') {
             config.logLevel = 'debug';
+        }
+        if (mockData) {
             config.mockPublicationData = true;
         }
         if (locale && typeof locale === 'string') {
