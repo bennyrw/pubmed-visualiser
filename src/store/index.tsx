@@ -11,7 +11,7 @@ export function getInitialState(): StoreState {
     // Support various debugging behaviours. Useful when getting layout right while the app is in particular states.
     if (config.mockPublicationData) {
         const debugData = {
-            'Cancer': {
+            'cancer': {
                 publicationData: {
                     2000: { articleCount: 70000 },
                     2001: { articleCount: 73000 },
@@ -36,7 +36,7 @@ export function getInitialState(): StoreState {
                 },
                 activeSearchSlot: 0,
             },
-            'Spanish flu': {
+            'spanish flu': {
                 publicationData: {
                     // occurs before the others
                     1920: { articleCount: 10 },
@@ -45,7 +45,7 @@ export function getInitialState(): StoreState {
                 },
                 activeSearchSlot: 1,
             },
-            'COVID-19': {
+            'covid-19': {
                 publicationData: {
                     // only over part of the range of 'Cancer'
                     2018: { articleCount: 0 },
@@ -54,7 +54,7 @@ export function getInitialState(): StoreState {
                 },
                 activeSearchSlot: 2,
             },
-            'Some really long disease name': {
+            'some really long disease name': {
                 publicationData: {
                     // only over part of the range of 'Cancer'
                     2008: { articleCount: 6000 },
@@ -85,4 +85,24 @@ export function getInitialState(): StoreState {
     }
 
     return state;
+}
+
+export const hasPendingOrLoadedDiseaseData = (state: StoreState, searchTerm: string) => {
+    return state.hasIn(['diseaseData', searchTerm]);
+}
+
+export const isSearchTermLoading = (state: StoreState, searchTerm: string): boolean => {
+    const diseaseData = state.getIn(['diseaseData', searchTerm]);
+    if (!diseaseData) {
+        return false;
+    }
+
+    for (let year = config.searchEarliestYear; year <= config.searchLatestYear; ++year) {
+        if (!diseaseData.publicationData.has(year)) {
+            // this year hasn't loaded
+            return true;
+        }
+    }
+
+    return false;
 }

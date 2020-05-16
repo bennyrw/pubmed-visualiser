@@ -4,14 +4,18 @@ import { connect } from 'react-redux';
 import * as Color from 'color';
 import { makeStyles } from '@material-ui/core/styles';
 import Chip from '@material-ui/core/Chip';
+import Avatar from '@material-ui/core/Avatar';
+import CircularProgress from '@material-ui/core/CircularProgress';
 
 import { getSearchBaseColour } from './SearchSlotColour';
 import { StoreState, DiseaseData } from '../types';
 import { removeSearchResults } from '../actions';
+import { isSearchTermLoading } from '../store';
 
 interface ChipInfo {
   label: string;
   baseColour: Color;
+  isLoading: boolean;
 }
 
 interface Props {
@@ -27,13 +31,20 @@ function SearchTermChips({ chipInfo, onDelete }: Props) {
 
   return (
     <div className={styles.chipPanel}>
-      {chipInfo.map((chip) => (
-        <Chip key={chip.label}
+      {chipInfo.map((chip) => {
+        const loadingElement = chip.isLoading ?
+          (<Avatar style={{ backgroundColor: chip.baseColour.hex() }}>
+            <CircularProgress style={{ color: chip.baseColour.lighten(0.9).hex() }} size='1rem' />
+          </Avatar>) : undefined;
+
+        return (<Chip key={chip.label}
+          avatar={loadingElement}
           style={{ backgroundColor: chip.baseColour.hex() }}
           label={chip.label}
           color="primary"
           onDelete={onDelete.bind(null, chip.label)} />
-      ))}
+        );
+      })}
     </div>
   );
 }
@@ -57,6 +68,7 @@ function mapStateToProps(state: StoreState) {
     chipInfo.push({
       label: searchTerm,
       baseColour: getSearchBaseColour(diseaseData.activeSearchSlot),
+      isLoading: isSearchTermLoading(state, searchTerm),
     });
   });
 

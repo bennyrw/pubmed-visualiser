@@ -10,7 +10,7 @@ import {
     fetchYearDataFailed,
 } from '../actions';
 import { getPublishedArticleData } from '../external/publishedArticleApi';
-import { hasPendingOrLoadedDiseaseData } from '../reducers';
+import { hasPendingOrLoadedDiseaseData } from '../store';
 
 /**
  * NCBI advertises a maximum of 10 requests per second when using an API key (3 without).
