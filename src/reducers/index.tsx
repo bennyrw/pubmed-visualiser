@@ -67,3 +67,7 @@ const addReceivedYearData = (state: StoreState, fetchOptions: FetchOptions, data
 const removeDiseaseData = (state: StoreState, searchTerm: string) => {
     return state.deleteIn(['diseaseData', searchTerm]);
 }
+
+export const hasPendingOrLoadedDiseaseData = (state: StoreState, searchTerm: string) => {
+    return state.hasIn(['diseaseData', searchTerm]);
+}
