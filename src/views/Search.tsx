@@ -10,7 +10,7 @@ import { makeStyles } from '@material-ui/core/styles';
 
 import { config } from '../config';
 import { StoreState } from '../types';
-import { startFetchData } from '../actions';
+import { startFetchData, removeSearchResults } from '../actions';
 
 interface Props {
   onSearch: (searchTerm: string) => void;
@@ -94,7 +94,11 @@ function mapStateToProps(state: StoreState) {
 
 function mapDispatchToProps(dispatch: any) {
   return {
-    onSearch: (searchTerm: string) => dispatch(startFetchData(searchTerm, config.searchEarliestYear, config.searchLatestYear)),
+    onSearch: (searchTerm: string) => {
+      // remove the search results for this term, if there are any (this will cancel any pending data requests for it)
+      dispatch(removeSearchResults(searchTerm));
+      dispatch(startFetchData(searchTerm, config.searchEarliestYear, config.searchLatestYear));
+    },
   }
 }
 
