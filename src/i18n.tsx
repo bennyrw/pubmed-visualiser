@@ -7,7 +7,10 @@ import { config } from './config';
  */
 const TEXT: Dictionary<Dictionary<string>> = {
     'en-GB': {
-        'number-of-articles': 'Number of articles'
+        'title': 'PubMed Research Visualiser',
+        'subtitle': 'Search for anything',
+        'number-of-articles': 'Number of articles',
+        'footer-prefix': 'Built using data from'
     }
 };
 

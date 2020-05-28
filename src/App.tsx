@@ -11,6 +11,7 @@ import Results from './views/Results';
 
 import { StoreState, DiseaseData } from './types';
 import { getUrlHash } from './config';
+import { getText } from './i18n';
 import { Typography } from '@material-ui/core';
 
 interface Props {
@@ -33,15 +34,15 @@ function App({ diseaseData, selectedMinYear, selectedMaxYear }: Props) {
   const hasPublicationData = diseaseData.size > 0;
   return (
     <Container component="main" maxWidth="xl">
-      <Typography align='center' color='primary' variant='h4'>PubMed Research Visualiser</Typography>
-      <Typography align='center' variant='subtitle1'>Search for anything</Typography>
+      <Typography align='center' color='primary' variant='h4'>{getText('title')}</Typography>
+      <Typography align='center' variant='subtitle1'>{getText('subtitle')}</Typography>
       <Search />
       <YearSlider />
       <div className={styles.resultPanel}>
         {hasPublicationData && <Results />}
       </div>
       <div className={styles.footer}>
-        <Typography align='center' variant='body2'>Built using data from the <a href='https://www.ncbi.nlm.nih.gov'>U.S. National Library of Medicine</a>'s <a href='https://www.ncbi.nlm.nih.gov/books/NBK3827'>PubMed</a> database</Typography>
+        <Typography align='center' variant='body2'>{getText('footer-prefix')} <a href="https://www.ncbi.nlm.nih.gov/books/NBK3827">PubMed</a></Typography>
       </div>
     </Container>
   );
