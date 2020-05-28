@@ -9,7 +9,7 @@ export async function getPublishedArticleData(searchTerm: string, year: number):
         const response = await fetch(getRequestUrl(searchTerm, year));
         const json = await response.json();
         const result = json.esearchresult;
-        //const historyKey = result.webenv; // todo - use this for more info
+        //const historyKey = result.webenv;
         const articleCount = result.count;
 
         return makeRecord<YearDataFields>({
@@ -20,10 +20,8 @@ export async function getPublishedArticleData(searchTerm: string, year: number):
     }
 }
 
-// todo - apply some security practice?
 const API_KEY = 'fa69d0a73ca3defd15d8d04c9df896019108'
 
-// todo - temp
 // https://www.ncbi.nlm.nih.gov/books/NBK25499/#chapter4.ESearch
 const getRequestUrl = (searchTerm: string, year: number) => {
     const safeSearchTerm = encodeURIComponent(searchTerm);
