@@ -97,7 +97,7 @@ function mapDispatchToProps(dispatch: any) {
     onSearch: (searchTerm: string) => {
       // remove the search results for this term, if there are any (this will cancel any pending data requests for it)
       dispatch(removeSearchResults(searchTerm));
-      dispatch(startFetchData(searchTerm, config.searchEarliestYear, config.searchLatestYear));
+      dispatch(startFetchData(searchTerm));
     },
   }
 }

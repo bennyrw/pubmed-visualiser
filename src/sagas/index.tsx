@@ -1,4 +1,4 @@
-import { fork, take, put, delay, retry, cancel, race, join, select, actionChannel } from 'redux-saga/effects';
+import { fork, take, put, delay, retry, cancel, race, join, select, actionChannel, all, PutEffect } from 'redux-saga/effects';
 import { Task } from 'redux-saga';
 import * as log from 'loglevel';
 
@@ -6,11 +6,14 @@ import {
     Action,
     START_FETCH_DATA, StartFetchDataAction,
     REMOVE_SEARCH_RESULTS,
+    SET_SELECTED_YEAR_RANGE, SetSelectedYearRangeAction,
     fetchYearDataSucceeded,
     fetchYearDataFailed,
+    startFetchData,
 } from '../actions';
 import { getPublishedArticleData } from '../external/publishedArticleApi';
-import { hasPendingOrLoadedDiseaseData } from '../store';
+import { hasPendingOrLoadedDiseaseData, getSelectedMinYear, getSelectedMaxYear, getCurrentSearches, hasDiseaseDataForYear } from '../store';
+import { Seq } from 'immutable';
 
 /**
  * NCBI advertises a maximum of 10 requests per second when using an API key (3 without).
@@ -34,6 +37,7 @@ export function* fetchDataSaga(): Generator {
     const channel = yield actionChannel([
         START_FETCH_DATA,
         REMOVE_SEARCH_RESULTS,
+        SET_SELECTED_YEAR_RANGE,
     ]);
 
     while (true) {
@@ -41,7 +45,7 @@ export function* fetchDataSaga(): Generator {
 
         if (action.type === START_FETCH_DATA) {
             const { payload } = action as StartFetchDataAction;
-            const { searchTerm, minYear, maxYear } = payload;
+            const { searchTerm } = payload;
 
             // check if this search was cancelled while it was queued
             const cancelledWhileQueued = !(yield select(hasPendingOrLoadedDiseaseData, searchTerm));
@@ -55,18 +59,26 @@ export function* fetchDataSaga(): Generator {
             let waitUntil: number = Date.now();
 
             const tasks = [];
+            const minYear = (yield select(getSelectedMinYear)) as number;
+            const maxYear = (yield select(getSelectedMaxYear)) as number;
             for (let year = minYear; year <= maxYear; ++year) {
-                log.debug(`forking fetchYearData for '${searchTerm}' in  ${year}`);
-                const task = (yield fork(fetchYearData, searchTerm, year, waitUntil)) as Task;
-                tasks.push(task);
-                waitUntil += delayBetweenRequests;
+                const hasYearAlready = (yield select(hasDiseaseDataForYear, searchTerm, year)) as boolean;
+                if (hasYearAlready) {
+                    log.debug(`already have ${searchTerm} in ${year}, no fetch required`);
+                } else {
+                    log.debug(`forking fetchYearData for '${searchTerm}' in  ${year}`);
+                    const task = (yield fork(fetchYearData, searchTerm, year, waitUntil)) as Task;
+                    tasks.push(task);
+                    waitUntil += delayBetweenRequests;
+                }
             }
 
             let completedSearch = false;
             while (!completedSearch) {
-                const [joinResult, removeAction] = (yield race([
+                const [joinResult, removeAction, setYearRangeAction] = (yield race([
                     join(tasks),
-                    take(REMOVE_SEARCH_RESULTS)
+                    take(REMOVE_SEARCH_RESULTS),
+                    take(SET_SELECTED_YEAR_RANGE),
                 ])) as Array<any>;
                 if (joinResult) {
                     completedSearch = true;
@@ -81,10 +93,17 @@ export function* fetchDataSaga(): Generator {
                             yield cancel(tasks[i]);
                         }
                     }
+                } else if (setYearRangeAction) {
+                    // todo - maybe ignore it here actually and let existing searches complete first?
                 }
             }
+        } else if (action.type === SET_SELECTED_YEAR_RANGE) {
+            // fire off new year range for all current searches
+            const currentSearches = (yield select(getCurrentSearches)) as Seq.Indexed<string>;
+            const tasks: PutEffect[] = currentSearches.map(searchTerm => put(startFetchData(searchTerm))).toArray();
+            yield all(tasks);
         }
-        // no forked tasks to cancel for REMOVE_SEARCH_RESULT as the related fetch will have completed
+        // else: no forked tasks to cancel for REMOVE_SEARCH_RESULT as the related fetch will have completed
     }
 }
 

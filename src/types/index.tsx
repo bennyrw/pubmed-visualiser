@@ -6,6 +6,14 @@ export interface StoreStateFields {
      * Disease data that we've retrieved. Keyed on the search term.
      */
     diseaseData: Map<string, DiseaseData>;
+    /**
+     * Current earliest year to retrieve article data for
+     */
+    selectedMinYear: number;
+    /**
+     * Current latest year to retrieve article data for.
+     */
+    selectedMaxYear: number;
 }
 
 /**

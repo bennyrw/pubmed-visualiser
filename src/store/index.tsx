@@ -6,6 +6,8 @@ import { config } from '../config';
 export function getInitialState(): StoreState {
     let state: StoreState = makeRecord<StoreStateFields>({
         diseaseData: OrderedMap<string, DiseaseData>(),
+        selectedMinYear: config.initialSelectedMinYear,
+        selectedMaxYear: config.initialSelectedMaxYear,
     });
 
     // Support various debugging behaviours. Useful when getting layout right while the app is in particular states.
@@ -91,13 +93,23 @@ export const hasPendingOrLoadedDiseaseData = (state: StoreState, searchTerm: str
     return state.hasIn(['diseaseData', searchTerm]);
 }
 
+export const hasDiseaseDataForYear = (state: StoreState, searchTerm: string, year: number) => {
+    console.log(`hasDiseaseDataForYear`, state.toJS());
+    const diseaseData = state.getIn(['diseaseData', searchTerm]);
+    if (!diseaseData) {
+        return false;
+    }
+
+    return diseaseData.publicationData.has(year);
+}
+
 export const isSearchTermLoading = (state: StoreState, searchTerm: string): boolean => {
     const diseaseData = state.getIn(['diseaseData', searchTerm]);
     if (!diseaseData) {
         return false;
     }
 
-    for (let year = config.searchEarliestYear; year <= config.searchLatestYear; ++year) {
+    for (let year = state.selectedMinYear; year <= state.selectedMaxYear; ++year) {
         if (!diseaseData.publicationData.has(year)) {
             // this year hasn't loaded
             return true;
@@ -106,3 +118,8 @@ export const isSearchTermLoading = (state: StoreState, searchTerm: string): bool
 
     return false;
 }
+
+export const getSelectedMinYear = (store: StoreState) => store.selectedMinYear;
+export const getSelectedMaxYear = (store: StoreState) => store.selectedMaxYear;
+
+export const getCurrentSearches = (store: StoreState) => store.diseaseData.keySeq();

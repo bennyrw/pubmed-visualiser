@@ -22,7 +22,11 @@ export const getArticleCountLabel = (dataKey: string) => dataKey.substring(DATA_
 /**
  * Get the data points to use in the chart, covering all disease areas the user has searched for.
  */
-export const getLineChartData = (diseaseData: Map<string, DiseaseData>): ChartData => {
+export const getLineChartData = (
+    diseaseData: Map<string, DiseaseData>,
+    minYear: number,
+    maxYear: number
+): ChartData => {
     let maxArticleCount = 0;
     const yearDataPointsMap: Dictionary<YearDataPoints> = {};
 
@@ -35,27 +39,26 @@ export const getLineChartData = (diseaseData: Map<string, DiseaseData>): ChartDa
             const year: number = yearDataEntry[0];
             const yearData: YearData = yearDataEntry[1];
 
-            let yearDataPoints = yearDataPointsMap[year];
-            if (!yearDataPoints) {
-                yearDataPoints = {
-                    year,
-                };
-                yearDataPointsMap[year] = yearDataPoints;
-            }
+            if (minYear <= year && year <= maxYear) {
+                let yearDataPoints = yearDataPointsMap[year];
+                if (!yearDataPoints) {
+                    yearDataPoints = {
+                        year,
+                    };
+                    yearDataPointsMap[year] = yearDataPoints;
+                }
 
-            if (yearData) {
-                maxArticleCount = Math.max(maxArticleCount, yearData.articleCount);
-                yearDataPoints[getArticleCountDataKey(searchTerm)] = yearData ? yearData.articleCount : null;
+                if (yearData) {
+                    maxArticleCount = Math.max(maxArticleCount, yearData.articleCount);
+                    yearDataPoints[getArticleCountDataKey(searchTerm)] = yearData ? yearData.articleCount : null;
+                }
             }
         });
     });
 
     // the above might have some missing years, but to keep the chart's x-axis in a consistent
     // scale, we fill in any gaps
-    const yearsWithData = Object.keys(yearDataPointsMap).map(y => parseInt(y, 10));
-    const earliestYear = min(yearsWithData) as number;
-    const latestYear = max(yearsWithData) as number;
-    range(earliestYear, latestYear + 1).forEach(year => {
+    range(minYear, maxYear + 1).forEach(year => {
         if (!yearDataPointsMap[year]) {
             yearDataPointsMap[year] = { year }
         }

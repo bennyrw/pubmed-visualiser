@@ -1,4 +1,5 @@
 import { parse, ParseOptions } from 'query-string';
+import * as log from 'loglevel';
 
 import { DEFAULT_LOCALE } from './i18n';
 
@@ -6,9 +7,14 @@ interface Config {
     /**
      * Initial seaches to make.
      */
-    searchTerms: string[];
-    searchEarliestYear: number;
-    searchLatestYear: number;
+    initialSearchTerms: string[];
+    initialSelectedMinYear: number;
+    initialSelectedMaxYear: number;
+    /**
+     * Absolute min & max year that can be selected
+     */
+    minSelectableYear: number;
+    maxSelectableYear: number;
     /**
      * Log level.
      */
@@ -25,9 +31,11 @@ interface Config {
 
 const getDefaults = (): Config => {
     return {
-        searchTerms: [],
-        searchEarliestYear: new Date().getFullYear() - 20,
-        searchLatestYear: new Date().getFullYear(),
+        initialSearchTerms: [],
+        initialSelectedMinYear: new Date().getFullYear() - 20,
+        initialSelectedMaxYear: new Date().getFullYear(),
+        minSelectableYear: 1950,
+        maxSelectableYear: new Date().getFullYear(),
         logLevel: 'info',
         locale: DEFAULT_LOCALE,
         mockPublicationData: false,
@@ -51,16 +59,16 @@ const getConfig = (): Config => {
         if (q) {
             if (typeof q === 'string') {
                 // single term
-                config.searchTerms = [q];
+                config.initialSearchTerms = [q];
             } else if (q instanceof Array) {
-                config.searchTerms = q;
+                config.initialSearchTerms = q;
             }
         }
         if (from && typeof from === 'string' && !isNaN(parseInt(from, 10))) {
-            config.searchEarliestYear = parseInt(from, 10);
+            config.initialSelectedMinYear = parseInt(from, 10);
         }
         if (to && typeof to === 'string' && !isNaN(parseInt(to, 10))) {
-            config.searchLatestYear = parseInt(to, 10);
+            config.initialSelectedMaxYear = parseInt(to, 10);
         }
         if (debug && typeof debug === 'boolean') {
             config.logLevel = 'debug';
@@ -79,8 +87,8 @@ const getConfig = (): Config => {
 export const config = getConfig();
 
 export const getUrlHash = (searchTerms: string[] = [],
-    yearFrom: number = config.searchEarliestYear,
-    yearTo: number = config.searchLatestYear,
-    debug: boolean = config.mockPublicationData): string => {
+    yearFrom: number = config.initialSelectedMinYear,
+    yearTo: number = config.initialSelectedMaxYear,
+    debug: boolean = config.logLevel === 'debug' || config.logLevel === 'trace') => {
     return `q=${searchTerms.join('|')}&from=${yearFrom}&to=${yearTo}${debug ? '&debug=true' : ''}`;
 }

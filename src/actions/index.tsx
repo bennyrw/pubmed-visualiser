@@ -16,6 +16,9 @@ type FETCH_YEAR_DATA_FAILED = typeof FETCH_YEAR_DATA_FAILED;
 export const REMOVE_SEARCH_RESULTS = 'REMOVE_SEARCH_RESULTS';
 type REMOVE_SEARCH_RESULTS = typeof REMOVE_SEARCH_RESULTS;
 
+export const SET_SELECTED_YEAR_RANGE = 'SET_SELECTED_YEAR_RANGE';
+type SET_SELECTED_YEAR_RANGE = typeof SET_SELECTED_YEAR_RANGE;
+
 //
 // Action types
 //
@@ -34,8 +37,6 @@ export interface StartFetchDataAction extends Action {
     type: START_FETCH_DATA;
     payload: {
         searchTerm: string;
-        minYear: number;
-        maxYear: number;
     }
 }
 
@@ -59,17 +60,23 @@ export interface RemoveSearchResultsAction extends Action {
     }
 }
 
+export interface SetSelectedYearRangeAction extends Action {
+    type: SET_SELECTED_YEAR_RANGE;
+    payload: {
+        minYear: number;
+        maxYear: number;
+    }
+}
+
 //
 // Action creators
 //
 
-export function startFetchData(searchTerm: string, minYear: number, maxYear: number): StartFetchDataAction {
+export function startFetchData(searchTerm: string): StartFetchDataAction {
     return {
         type: START_FETCH_DATA,
         payload: {
             searchTerm,
-            minYear,
-            maxYear,
         }
     };
 }
@@ -102,6 +109,16 @@ export function removeSearchResults(searchTerm: string): RemoveSearchResultsActi
         type: REMOVE_SEARCH_RESULTS,
         payload: {
             searchTerm,
+        }
+    }
+}
+
+export function setSelectedYearRange(minYear: number, maxYear: number): SetSelectedYearRangeAction {
+    return {
+        type: SET_SELECTED_YEAR_RANGE,
+        payload: {
+            minYear,
+            maxYear,
         }
     }
 }

@@ -8,6 +8,7 @@ import {
     FETCH_YEAR_DATA_SUCCEEDED, FetchYearDataSucceededAction,
     FETCH_YEAR_DATA_FAILED, FetchYearDataFailedAction,
     REMOVE_SEARCH_RESULTS, RemoveSearchResultsAction,
+    SET_SELECTED_YEAR_RANGE, SetSelectedYearRangeAction,
 } from '../actions/index';
 import { getInitialState } from '../store';
 import { StoreState, DiseaseData, DiseaseDataFields, YearData, makeRecord } from '../types';
@@ -36,6 +37,10 @@ export function reducer(state = getInitialState(), action: Action): StoreState {
         case REMOVE_SEARCH_RESULTS: {
             const { payload: { searchTerm } } = action as RemoveSearchResultsAction;
             return removeDiseaseData(state, searchTerm);
+        }
+        case SET_SELECTED_YEAR_RANGE: {
+            const { payload: { minYear, maxYear } } = action as SetSelectedYearRangeAction;
+            return updateSelectedYearRange(state, minYear, maxYear);
         }
     }
     return state;
@@ -66,4 +71,9 @@ const addReceivedYearData = (state: StoreState, fetchOptions: FetchOptions, data
 
 const removeDiseaseData = (state: StoreState, searchTerm: string) => {
     return state.deleteIn(['diseaseData', searchTerm]);
+}
+
+const updateSelectedYearRange = (state: StoreState, minYear: number, maxYear: number) => {
+    return state.set('selectedMinYear', minYear)
+        .set('selectedMaxYear', maxYear);
 }

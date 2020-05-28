@@ -15,13 +15,15 @@ import { getSearchBaseColour } from './SearchSlotColour';
 
 interface Props {
     diseaseData: Map<string, DiseaseData>;
+    selectedMinYear: number;
+    selectedMaxYear: number;
 }
 
 function ResultsChart(props: Props) {
-    const { diseaseData } = props;
+    const { diseaseData, selectedMinYear, selectedMaxYear } = props;
 
     // create a line for each search term we have
-    const allChartData = getLineChartData(diseaseData);
+    const allChartData = getLineChartData(diseaseData, selectedMinYear, selectedMaxYear);
     const allLineProps: Array<LineProps> = diseaseData.entrySeq().toArray().map((entry) => {
         const [searchTerm, searchDiseaseData] = entry;
         const baseColour = getSearchBaseColour(searchDiseaseData.activeSearchSlot);
@@ -80,9 +82,11 @@ function ResultsChart(props: Props) {
     );
 }
 
-function mapStateToProps({ diseaseData }: StoreState) {
+function mapStateToProps({ diseaseData, selectedMinYear, selectedMaxYear }: StoreState) {
     return {
         diseaseData,
+        selectedMinYear,
+        selectedMaxYear,
     }
 }
 

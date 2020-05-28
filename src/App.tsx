@@ -6,6 +6,7 @@ import Container from '@material-ui/core/Container';
 import { makeStyles } from '@material-ui/core/styles';
 
 import Search from './views/Search';
+import YearSlider from './views/YearSlider';
 import Results from './views/Results';
 
 import { StoreState, DiseaseData } from './types';
@@ -14,17 +15,19 @@ import { Typography } from '@material-ui/core';
 
 interface Props {
   diseaseData: Map<string, DiseaseData>;
+  selectedMinYear: number;
+  selectedMaxYear: number;
 }
 
 /**
  * Top level UI component.
  */
-function App({ diseaseData }: Props) {
+function App({ diseaseData, selectedMinYear, selectedMaxYear }: Props) {
   const styles = useStyles();
 
   useEffect(() => {
     const searches = diseaseData.keySeq();
-    window.location.hash = getUrlHash(searches.toArray());
+    window.location.hash = getUrlHash(searches.toArray(), selectedMinYear, selectedMaxYear);
   });
 
   const hasPublicationData = diseaseData.size > 0;
@@ -33,6 +36,7 @@ function App({ diseaseData }: Props) {
       <Typography align='center' color='primary' variant='h4'>PubMed Research Visualiser</Typography>
       <Typography align='center' variant='subtitle1'>Search for anything</Typography>
       <Search />
+      <YearSlider />
       <div className={styles.resultPanel}>
         {hasPublicationData && <Results />}
       </div>
@@ -61,9 +65,11 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function mapStateToProps({ diseaseData }: StoreState) {
+function mapStateToProps({ diseaseData, selectedMinYear, selectedMaxYear }: StoreState) {
   return {
     diseaseData,
+    selectedMinYear,
+    selectedMaxYear,
   }
 }
 

@@ -32,8 +32,8 @@ const store = createStore<StoreState, Action, any, any>(reducer,
 sagaMiddleware.run(fetchDataSaga);
 
 // schedule initial searches
-config.searchTerms.forEach(searchTerm => {
-  store.dispatch(startFetchData(searchTerm, config.searchEarliestYear, config.searchLatestYear));
+config.initialSearchTerms.forEach(searchTerm => {
+  store.dispatch(startFetchData(searchTerm));
 });
 
 ReactDOM.render(
