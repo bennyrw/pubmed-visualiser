@@ -1,13 +1,16 @@
-import { OrderedMap, fromJS, isKeyed } from 'immutable';
+import { OrderedMap, fromJS, isKeyed, List } from 'immutable';
 
-import { StoreState, StoreStateFields, DiseaseData, DiseaseDataFields, YearDataFields, makeRecord } from '../types';
+import { StoreState, StoreStateFields, DiseaseData, DiseaseDataFields, YearDataFields, FetchRequest,
+    RecordType, makeRecord } from '../types';
 import { config } from '../config';
 
 export function getInitialState(): StoreState {
-    let state: StoreState = makeRecord<StoreStateFields>({
+    let state: StoreState = makeRecord<StoreStateFields>(RecordType.StoreState, {
         diseaseData: OrderedMap<string, DiseaseData>(),
         selectedMinYear: config.initialSelectedMinYear,
         selectedMaxYear: config.initialSelectedMaxYear,
+        pendingRequests: List<FetchRequest>(),
+        inflightRequests: List<FetchRequest>(),
     });
 
     // Support various debugging behaviours. Useful when getting layout right while the app is in particular states.
@@ -72,10 +75,10 @@ export function getInitialState(): StoreState {
             if (isKeyed(value)) {
                 if (path && path.length === 1) {
                     // DiseaseData's are records
-                    return makeRecord<DiseaseDataFields>(value.toObject() as DiseaseDataFields);
+                    return makeRecord<DiseaseDataFields>(RecordType.DiseaseData, value.toObject() as DiseaseDataFields);
                 } else if (path && path.length === 3) {
                     // YearData's are records
-                    return makeRecord<YearDataFields>(value.toObject() as YearDataFields);
+                    return makeRecord<YearDataFields>(RecordType.DiseaseData, value.toObject() as YearDataFields);
                 } else {
                     return value.toOrderedMap();
                 }
@@ -93,8 +96,11 @@ export const hasPendingOrLoadedDiseaseData = (state: StoreState, searchTerm: str
     return state.hasIn(['diseaseData', searchTerm]);
 }
 
+export const getNextPendingFetchRequest = (state: StoreState): FetchRequest => {
+    return state.pendingRequests.first();
+}
+
 export const hasDiseaseDataForYear = (state: StoreState, searchTerm: string, year: number) => {
-    console.log(`hasDiseaseDataForYear`, state.toJS());
     const diseaseData = state.getIn(['diseaseData', searchTerm]);
     if (!diseaseData) {
         return false;

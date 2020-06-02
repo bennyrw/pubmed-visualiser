@@ -1,4 +1,4 @@
-import { YearData } from '../types';
+import { YearData, FetchRequest } from '../types';
 
 //
 // Action constants
@@ -6,6 +6,9 @@ import { YearData } from '../types';
 
 export const START_FETCH_DATA = 'START_FETCH_DATA';
 type START_FETCH_DATA = typeof START_FETCH_DATA;
+
+export const FETCH_YEAR_DATA_REQUESTED = 'FETCH_YEAR_DATA_REQUESTED';
+type FETCH_YEAR_DATA_REQUESTED = typeof FETCH_YEAR_DATA_REQUESTED;
 
 export const FETCH_YEAR_DATA_SUCCEEDED = 'FETCH_YEAR_DATA_SUCCEEDED';
 type FETCH_YEAR_DATA_SUCCEEDED = typeof FETCH_YEAR_DATA_SUCCEEDED;
@@ -23,11 +26,6 @@ type SET_SELECTED_YEAR_RANGE = typeof SET_SELECTED_YEAR_RANGE;
 // Action types
 //
 
-export interface FetchOptions {
-    searchTerm: string;
-    year: number;
-}
-
 export interface Action {
     type: any;
     payload?: any;
@@ -40,17 +38,26 @@ export interface StartFetchDataAction extends Action {
     }
 }
 
+export interface FetchYearDataRequestedAction extends Action {
+    type: FETCH_YEAR_DATA_REQUESTED;
+    payload: {
+        fetchRequest: FetchRequest;
+    }
+}
+
 export interface FetchYearDataSucceededAction extends Action {
     type: FETCH_YEAR_DATA_SUCCEEDED;
     payload: {
-        fetchOptions: FetchOptions;
+        fetchRequest: FetchRequest;
         data: YearData;
     }
 }
 
 export interface FetchYearDataFailedAction extends Action {
     type: FETCH_YEAR_DATA_FAILED;
-    payload: FetchOptions;
+    payload: {
+        fetchRequest: FetchRequest;
+    }
 }
 
 export interface RemoveSearchResultsAction extends Action {
@@ -81,25 +88,30 @@ export function startFetchData(searchTerm: string): StartFetchDataAction {
     };
 }
 
-export function fetchYearDataSucceeded(searchTerm: string, year: number, data: YearData): FetchYearDataSucceededAction {
+export function fetchYearDataRequested(fetchRequest: FetchRequest): FetchYearDataRequestedAction {
+    return {
+        type: FETCH_YEAR_DATA_REQUESTED,
+        payload: {
+            fetchRequest,
+        },
+    };
+}
+
+export function fetchYearDataSucceeded(fetchRequest: FetchRequest, data: YearData): FetchYearDataSucceededAction {
     return {
         type: FETCH_YEAR_DATA_SUCCEEDED,
         payload: {
-            fetchOptions: {
-                searchTerm,
-                year,
-            },
+            fetchRequest,
             data,
         },
     };
 }
 
-export function fetchYearDataFailed(searchTerm: string, year: number): FetchYearDataFailedAction {
+export function fetchYearDataFailed(fetchRequest: FetchRequest): FetchYearDataFailedAction {
     return {
         type: FETCH_YEAR_DATA_FAILED,
         payload: {
-            searchTerm,
-            year,
+            fetchRequest,
         }
     }
 }
