@@ -21,7 +21,7 @@ const initialState = getInitialState();
 const loggingPassThroughMiddleware: Middleware = store => next => action => {
   log.debug('dispatching', action);
   let result = next(action);
-  log.debug('next state', store.getState());
+  log.debug('next state', store.getState().toJS());
   return result;
 }
 
