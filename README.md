@@ -2,6 +2,8 @@
 
 Visualise research using [PubMed data](https://www.ncbi.nlm.nih.gov/books/NBK3827).
 
+Available on https://pubmed-visualiser.netlify.app
+
 ## Usage
 
 In the project directory, tested on Node 10, use:
