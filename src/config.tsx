@@ -1,5 +1,5 @@
 import { parse, ParseOptions } from 'query-string';
-import * as log from 'loglevel';
+import { mapKeys } from 'lodash';
 
 import { DEFAULT_LOCALE } from './i18n';
 
@@ -55,7 +55,9 @@ const getConfig = (): Config => {
             arrayFormat: 'separator',
             arrayFormatSeparator: '|',
         };
-        const { q, from, to, locale, debug, mockData } = parse(urlHash.toLowerCase(), parseOptions);
+        // parse result is in the case provided in the URL
+        const parseResult = parse(urlHash, parseOptions);
+        const { q, from, to, locale, debug, mockData } = mapKeys(parseResult, (value, key) => key.toLowerCase());
         if (q) {
             if (typeof q === 'string') {
                 // single term

@@ -1,5 +1,5 @@
 import { Map } from 'immutable';
-import { min, max, range, sortBy } from 'lodash';
+import { range, sortBy } from 'lodash';
 
 import { Dictionary, YearData, DiseaseData } from '../types';
 
