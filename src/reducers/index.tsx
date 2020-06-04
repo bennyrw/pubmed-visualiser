@@ -41,7 +41,7 @@ export function reducer(state = getInitialState(), action: Action): StoreState {
         }
         case FETCH_YEAR_DATA_FAILED: {
             const { payload: { fetchRequest } } = action as FetchYearDataFailedAction;
-            // todo - handle failure? Maybe show an icon or something?
+            // for now, don't do anything - we hopefully will have data in adjacent years so the graph will look ok
             return removeInflightRequest(state, fetchRequest);
         }
         case REMOVE_SEARCH_RESULTS: {

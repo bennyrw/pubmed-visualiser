@@ -32,7 +32,6 @@ function Search(props: Props) {
     props.onSearch(searchTerm);
   }
 
-  // todo - extend this if reached limit of search terms, also disable the search input
   const buttonEnabled = Boolean(searchTerm);
   const styles = useStyles();
 

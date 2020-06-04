@@ -1,6 +1,6 @@
 {
-  "short_name": "Disease-Trends",
-  "name": "Show research mentions of a disease",
+  "short_name": "PubMed Visualiser",
+  "name": "Show mentions of terms in PubMed data year on year",
   "icons": [
     {
       "src": "favicon.ico",
