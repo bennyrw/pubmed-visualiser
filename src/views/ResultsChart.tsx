@@ -41,7 +41,7 @@ function ResultsChart(props: Props) {
 
     const axisAndLegendFontProps = {
         fontFamily: 'roboto, sans-serif',
-        fontSize: '0.8em'
+        fontSize: '0.8em',
     }
 
     return (
@@ -50,12 +50,14 @@ function ResultsChart(props: Props) {
                 <LineChart data={allChartData.yearDataPoints}>
                     <CartesianGrid strokeDasharray="3 3" />
                     <XAxis dataKey="year" tick={{ ...axisAndLegendFontProps }} />
-                    <YAxis width={90}
+                    <YAxis width={55}
                         tick={{ ...axisAndLegendFontProps }}
                         label={{
-                            value: getText('number-of-articles'),
-                            angle: -90,
-                            position: 'insideLeft',
+                            value: getText('articles'),
+                            angle: 0,
+                            viewBox: {
+                                x: 40, y: -5, width: 100, height: 50,
+                            },
                             ...axisAndLegendFontProps,
                         }}
                         domain={

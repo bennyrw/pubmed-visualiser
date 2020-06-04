@@ -33,7 +33,7 @@ function App({ diseaseData, selectedMinYear, selectedMaxYear }: Props) {
 
   const hasPublicationData = diseaseData.size > 0;
   return (
-    <Container component="main" maxWidth="xl">
+    <div>
       <Typography align='center' color='primary' variant='h4'>{getText('title')}</Typography>
       <Typography align='center' variant='subtitle1'>{getText('subtitle')}</Typography>
       <Search />
@@ -44,7 +44,7 @@ function App({ diseaseData, selectedMinYear, selectedMaxYear }: Props) {
       <div className={styles.footer}>
         <Typography align='center' variant='body2'>{getText('footer-prefix')} <a href="https://www.ncbi.nlm.nih.gov/books/NBK3827">PubMed</a></Typography>
       </div>
-    </Container>
+    </div>
   );
 }
 
@@ -58,11 +58,7 @@ const useStyles = makeStyles((theme) => ({
     overflow: 'hidden',
   },
   footer: {
-    position: 'fixed',
-    bottom: 0,
-    left: 0,
-    right: 0,
-    height: '2rem',
+    marginTop: theme.spacing(8),
   },
 }));
 
