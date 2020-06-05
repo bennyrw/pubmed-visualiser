@@ -1,4 +1,4 @@
-[![Netlify Status](https://api.netlify.com/api/v1/badges/4a7fadb4-3456-46e4-b1bc-eeb919985dbe/deploy-status)](https://app.netlify.com/sites/blissful-bartik-e24992/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/4a7fadb4-3456-46e4-b1bc-eeb919985dbe/deploy-status)](https://app.netlify.com/sites/pubmed-visualiser/deploys)
 
 Visualise research using [PubMed data](https://www.ncbi.nlm.nih.gov/books/NBK3827).
 
