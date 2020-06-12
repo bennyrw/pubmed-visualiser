@@ -2,6 +2,7 @@ import { parse, ParseOptions } from 'query-string';
 import { mapKeys } from 'lodash';
 
 import { DEFAULT_LOCALE } from './i18n';
+import { copyFile } from 'fs';
 
 interface Config {
     /**
@@ -59,11 +60,21 @@ const getConfig = (): Config => {
         const parseResult = parse(urlHash, parseOptions);
         const { q, from, to, locale, debug, mockData } = mapKeys(parseResult, (value, key) => key.toLowerCase());
         if (q) {
+            let encodedInitialSearchTerms: string[] = [];
             if (typeof q === 'string') {
-                // single term
-                config.initialSearchTerms = [q];
+                if (q.indexOf('|') >= 0) {
+                    // workaround a bug in query-string's parsing that can leave arrays unexpanded when clicking a link
+                    encodedInitialSearchTerms = q.split('|');
+                } else {
+                    // single term
+                    encodedInitialSearchTerms = [q];
+                }
             } else if (q instanceof Array) {
-                config.initialSearchTerms = q;
+                encodedInitialSearchTerms = q;
+            }
+
+            if (encodedInitialSearchTerms) {
+                config.initialSearchTerms = encodedInitialSearchTerms.map(encoded => decodeURIComponent(encoded));
             }
         }
         if (from && typeof from === 'string' && !isNaN(parseInt(from, 10))) {
@@ -92,5 +103,6 @@ export const getUrlHash = (searchTerms: string[] = [],
     yearFrom: number = config.initialSelectedMinYear,
     yearTo: number = config.initialSelectedMaxYear,
     debug: boolean = config.logLevel === 'debug' || config.logLevel === 'trace') => {
-    return `q=${searchTerms.join('|')}&from=${yearFrom}&to=${yearTo}${debug ? '&debug=true' : ''}`;
+        const encodedSearchTerms = searchTerms.map(term => encodeURIComponent(term));
+        return `q=${encodedSearchTerms.join('|')}&from=${yearFrom}&to=${yearTo}${debug ? '&debug=true' : ''}`;
 }
