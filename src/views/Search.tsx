@@ -30,6 +30,8 @@ function Search(props: Props) {
     e.preventDefault();
 
     props.onSearch(searchTerm);
+    // also clear the input
+    setSearchTerm('');
   }
 
   const buttonEnabled = Boolean(searchTerm);
